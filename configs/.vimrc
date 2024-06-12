@@ -213,14 +213,16 @@ if has("autocmd")
 
     au BufNewFile,BufRead LICENSE set tw=80
 
-    au BufRead,BufNewFile perl set ts=4 st=4 et
-    au BufRead,BufNewFile *.pl set ts=4 st=4 et
+    au BufRead,BufNewFile perl set ts=4 sts=4 et
+    au BufRead,BufNewFile *.pl set ts=4 sts=4 et
 
     "au BufNew,BufRead *.pp set syntax=conf
     " filetype is better than syntax since it figures out indentation and tab completion etc and the ruby is better than conf since it gives more syntax highlighting
     au BufNew,BufRead *.pp set filetype=ruby sts=2 sw=2 ts=2 et
 
-    au BufNew,BufRead *.tf set sts=2 sw=2 ts=2 et filetype=conf
+    au BufNew,BufRead     *.tf  set filetype=terraform sts=2 sw=2 ts=2 et
+    au BufNewFile,BufRead *.hcl set filetype=terraform sts=2 sw=2 ts=2 et
+
     au BufNew,BufRead *.yml set sts=2 sw=2 ts=2 et
     au BufNew,BufRead *.yaml set sts=2 sw=2 ts=2 et
 
@@ -296,6 +298,7 @@ if has("autocmd")
     "au BufNew,BufRead *.yml,*.yaml nmap ;l :w<CR>:!clear; js-yaml "%" >/dev/null && echo YAML OK<CR>
     au BufNew,BufRead *.yml,*.yaml,autoinstall-user-data nmap ;l :w<CR>:!clear; yamllint "%" && echo YAML OK<CR>
     au BufNew,BufRead *.tf,*.tf.json,*.tfvars,*.tfvars.json nmap ;l :w<CR>:call TerraformValidate()<CR>
+    au BufNew,BufRead *.hcl                                 nmap ;l :w<CR>:call TerragruntValidate()<CR>
     au BufNew,BufRead *.pkr.hcl,*.pkr.json nmap ;l :w<CR>:!packer init "%" && packer validate "%" && packer fmt -diff "%" <CR>
     au BufNew,BufRead *.pkr.hcl,*.pkr.json nmap ;f :w<CR>:!packer fmt -diff "%" <CR>
 
@@ -664,6 +667,11 @@ function! TerraformValidate()
     :%s/^[[:space:]]*[-~][[:space:]]//e
     :%s/[[:space:]]->[[:space:]].*$//e
     :!clear; bash -c 'if [ -d "%:p:h"/.terraform ]; then cd "%:p:h"; fi; { terraform fmt -diff; terraform validate; } | more -R'
+endfunction
+
+function! TerragruntValidate()
+    :%s/[[:space:]]->[[:space:]].*$//e
+    :!clear; bash -c 'if [ -d "%:p:h"/.terraform ]; then cd "%:p:h"; fi; { terragrunt fmthcl --terragrunt-diff; terragrunt validate; } | more -R'
 endfunction
 
 function! TerraformPlan()
