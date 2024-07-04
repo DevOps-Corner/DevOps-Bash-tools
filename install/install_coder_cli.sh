@@ -2,9 +2,9 @@
 #  vim:ts=4:sts=4:sw=4:et
 #
 #  Author: Hari Sekhon
-#  Date: 2022-01-11 10:07:36 +0000 (Tue, 11 Jan 2022)
+#  Date: 2024-07-03 23:25:02 +0200 (Wed, 03 Jul 2024)
 #
-#  https://github.com/HariSekhon/DevOps-Bash-tools
+#  https///github.com/HariSekhon/DevOps-Bash-tools
 #
 #  License: see accompanying Hari Sekhon LICENSE file
 #
@@ -22,38 +22,36 @@ srcdir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # shellcheck disable=SC2034,SC2154
 usage_description="
-Installs GitHub CLI
-
-Once installed, configure authentication by creating a Personal Access Token (PAT) here:
-
-    https://github.com/settings/tokens
-
-and then exporting that as an environment variable - either GH_TOKEN or GITHUB_TOKEN (the former has higher precedence so is recommended):
-
-    export GH_TOKEN=...
+Installs the Coder CLI via GitHub binary releases
 "
 
 # used by usage() in lib/utils.sh
 # shellcheck disable=SC2034
 usage_args="[<version>]"
 
-export PATH="$PATH:$HOME/bin"
-
 help_usage "$@"
 
 max_args 1 "$@"
 
-#version="${1:-2.4.0}"
+#version="${1:-2.13.0}"
 version="${1:-latest}"
 
+# on Mac just runs:
+#
+#   brew install coder/coder/coder
+#
+# which we can do via ../setup/brew-packages-desktop-taps.txt
+#
+#curl -L https://coder.com/install.sh | sh
+
 export ARCH_X86_64=amd64
-export OS_DARWIN=macOS
+export ARCH_ARM64=amd64
+
+export RUN_VERSION_ARG=1
 
 ext="tar.gz"
 if is_mac; then
     ext="zip"
 fi
 
-export RUN_VERSION_ARG=1
-
-"$srcdir/../github/github_install_binary.sh" cli/cli "gh_{version}_{os}_{arch}.$ext" "$version" "gh_{version}_{os}_{arch}/bin/gh"
+"$srcdir/../github/github_install_binary.sh" coder/coder "coder_{version}_{os}_{arch}.$ext" "$version" coder
