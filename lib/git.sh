@@ -53,8 +53,29 @@ git_root(){
     git rev-parse --show-toplevel
 }
 
+git_root_basedir(){
+    local git_root
+    git_root="$(git_root)"
+    echo "${git_root##*/}"
+}
+
+git_relative_dir(){
+    if ! is_in_git_repo; then
+        echo "Error: not in a git repo when trying to determine git_relative_dir()" >&2
+    fi
+    local git_root
+    local git_root_basedir
+    git_root="$(git_root)"
+    git_root_basedir="$(git_root_basedir)"
+    echo "$git_root_basedir/${PWD##$git_root/}"
+}
+
 is_in_git_repo(){
     git_root &>/dev/null
+}
+
+git_commit_short_sha(){
+    git rev-parse --short HEAD
 }
 
 current_branch(){
