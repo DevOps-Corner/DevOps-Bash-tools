@@ -60,21 +60,21 @@ is_jps_output(){
     [[ "$1" =~ ^([[:digit:]]+)[[:space:]]+([[:alnum:]]*)$ ]]
 }
 
-replace_classpath_with_token(){
-    sed 's/[[:space:]]-\(cp\|classpath\)[[:space:]=]\+[^ ]\+\([[:space:]]\|$\)/ <CLASSPATHS> /' <<< "$1"
-}
+#replace_classpath_with_token(){
+#    sed 's/[[:space:]]-\(cp\|classpath\)[[:space:]=]\+.\+[[:space:]]/ <CLASSPATHS> /' <<< "$1"
+#}
 
 show_cli_classpath(){
     local cmd="$1"
     [[ "$cmd" =~ java ]] || return
     args="${cmd#*java }"
-    cmd="$(replace_classpath_with_token "$cmd")"
+    #cmd="$(replace_classpath_with_token "$cmd")"
 	echo
     echo "command:  $cmd"
     echo
     count=0
 	# XXX: will break upon directories in classpath containing a space, but this should be rare on unix systems
-    classpaths="$(grep -Eo -- '[[:space:]]-(cp|classpath)[[:space:]]*([^[:space:]]+)')"
+    classpaths="$(grep -Eo -- '-(cp|classpath)[=[:space:]]+(.+)[[:space:]]' <<< "$args" || die "Failed to find classpath in args '$args'")"
 	classpaths="${classpaths## }"
 	classpaths="${classpaths##-cp}"
 	classpaths="${classpaths##-classpath}"
@@ -109,7 +109,7 @@ show_jinfo_classpath(){
             echo "skipping $cmd since it doesn't match regex 'java'"
             return
         fi
-        cmd="$(replace_classpath_with_token "$cmd")"
+        #cmd="$(replace_classpath_with_token "$cmd")"
         echo
         echo "command:  $cmd"
         if [[ "$cmd" =~ ^[[:space:]]*[[:alnum:]]+[[:space:]]+[[:digit:]]+[[:space:]]+ ]]; then
@@ -138,6 +138,8 @@ show_jinfo_classpath(){
             line="${line#*=}"
             line="${line# }"
             count=0
+            # jinfo escapes the colon separators with backslashes
+            line="$(sed 's/\\:/:/g' <<< "$line")"
             IFS=':' read -r -a classpaths <<< "$line"
             for classpath in "${classpaths[@]}"; do
                 [ -z "$classpath" ] && continue
@@ -159,7 +161,7 @@ show_jinfo_classpath(){
 
 if ! process_list="$(jps 2>/dev/null)"; then
 	echo "WARNING: jps failed, perhaps not in \$PATH? (\$PATH = $PATH)" >&2
-	echo "WARNING: Falling back to ps command" >&2
+	echo "WARNING: Falling back to ps command, may be less accurate" >&2
 	process_list="$(ps -e -o pid,user,command)"
 fi
 
@@ -173,7 +175,7 @@ while IFS= read -r line; do
         else
             show_jinfo_classpath "$line"
         fi
-    elif [[ "$line" =~ java.*$command_regex ]]; then
+    elif [[ "$line" =~ java[[:space:]].*$command_regex ]]; then
         #show_jinfo_classpath "$line"
         show_cli_classpath "$line"
     fi
