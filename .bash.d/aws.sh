@@ -42,7 +42,11 @@ if [ -d ~/.ebcli-virtual-env/executables/ ]; then
     add_PATH ~/.ebcli-virtual-env/executables/
 fi
 
-# =====================
+# ============================================================================ #
+#                   A l i a s e s   a n d   F u n c t i o n s
+# ============================================================================ #
+
+alias awsl='aws sso login'
 
 #alias s3='s3cmd'
 alias s3='aws s3'
@@ -53,6 +57,8 @@ alias awsc='awscon'
 
 # easily set a profile env var
 aws_profile(){
+    # false positive
+    # shellcheck disable=SC2317
     export AWS_PROFILE="$*"
 }
 alias awsp=awsprofile
