@@ -17,12 +17,12 @@ set -euo pipefail
 [ -n "${DEBUG:-}" ] && set -x
 libdir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# shellcheck disable=SC1090
+# shellcheck disable=SC1090,SC1091
 . "$libdir/utils.sh"
 
 # used in client scripts
 # shellcheck disable=SC2034
-usage_aws_cli_required="AWS CLI is required to be installed and configured, as well as jq  (run 'make aws && aws configure')"
+usage_aws_cli_required="Requires AWS CLI to be installed and configured, as well as jq  (run 'make aws && aws configure')"
 
 aws_account_id(){
     aws sts get-caller-identity --query Account --output text
@@ -127,4 +127,13 @@ aws_access_keys_exports_to_credentials(){
         value="${env_var#*=}"
         echo "$(tr '[:upper:]' '[:lower:]' <<< "$key")=$value"
     done
+}
+
+aws_validate_volume_id(){
+    local volume_id="$1"
+    if ! [[ "$volume_id" =~ ^vol-[[:alnum:]]{17}$ ]]; then
+        usage "
+    Invalid volume ID given, expected format: vol-xxxxxxxxxxxxxxxxx,
+                                   but given: $volume_id"
+    fi
 }

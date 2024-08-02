@@ -1170,6 +1170,12 @@ no_more_args(){
     fi
 }
 
+no_args(){
+    if [ -n "${1:-}" ]; then
+        usage "args given where none expected:  $*"
+    fi
+}
+
 check_env_defined(){
     local env="$1"
     if [ -z "${!env:-}" ]; then
@@ -1219,6 +1225,33 @@ is_regex(){
     local regex="$1"
     # right side must not be quoted in order to be properly interpreted as regex
     [[ "$regex" =~ $regex ]]
+}
+
+exponential(){
+    local int="$1"
+    local max="${2:-}"
+    if ! is_int "$int"; then
+        echo "ERROR: non-integer passed as first arg to exponential() function!" >&2
+        return 1
+    fi
+    if [ -n "$max" ]; then
+        if ! is_int "$max"; then
+            echo "ERROR: non-integer passed as second arg to exponential() function!" >&2
+            return 1
+        fi
+        if [ "$int" -ge "$max" ]; then
+            echo "$max"
+            return
+        fi
+    fi
+    local result
+    result="$((int * 2))"
+    if [ -n "$max" ]; then
+        if [ "$result" -gt "$max" ]; then
+            result="$max"
+        fi
+    fi
+    echo "$result"
 }
 
 parse_export_key_value(){
