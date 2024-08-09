@@ -16,9 +16,11 @@
 # Files to link to $HOME, one per line
 
 .envrc
+.envrc-python
 .gitconfig
 .gitignore
 .mdlrc
+.pre-commit-config.yaml
 .pylintrc
 configs/.ansible.cfg
 configs/.athenacli/athenaclirc
