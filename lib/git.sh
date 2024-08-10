@@ -67,11 +67,14 @@ git_relative_dir(){
     local git_root_basedir
     git_root="$(git_root)"
     git_root_basedir="$(git_root_basedir)"
+    # false positive - this works in Bash (tested on Mac)
+    # shellcheck disable=SC2295
     echo "$git_root_basedir/${PWD##$git_root/}"
 }
 
 is_in_git_repo(){
-    git_root &>/dev/null
+    #git_root &>/dev/null
+    git rev-parse --is-inside-work-tree &>/dev/null
 }
 
 git_commit_short_sha(){
