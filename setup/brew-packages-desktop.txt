@@ -116,6 +116,7 @@ gnuplot
 gradle
 #gradle-completion  # forces bash-completion which slows down my shells
 graphviz  # for the 'dot' command (use with terraform graph), and also github.com/HariSekhon/Diagrams-as-Code
+gron  # flattens JSON to be greppable
 #groovy  # see near end
 #groovysdk  # see near end
 hadolint
@@ -137,6 +138,7 @@ ipython
 #isc-dhcp  # the classic DHCP daemon, use for bootstrapping PXE installing Debian Linux or similar as per https://github.com/HariSekhon/Knowledge-Base/blob/main/dhcp.md
 jsonlint  # in brew-packages.txt
 jenkins-x/jx/jx
+jnv  # json interactive viewer (pipe kubectl into it)
 #jpeg
 #jq  # in brew-packages.txt
 jython
