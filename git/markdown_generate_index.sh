@@ -22,25 +22,29 @@ srcdir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # shellcheck disable=SC2034,SC2154
 usage_description="
-Generates a markdown index list from the headings in a given README.md file
+Generates a markdown index list from the headings in a given markdown file such as README.md
 
-If no file is given but one is found in the \$PWD, then uses that
+If no file is given but README.md is found in the \$PWD, then uses that
 "
 
 # used by usage() in lib/utils.sh
 # shellcheck disable=SC2034
-usage_args="<README.md>"
+usage_args="[<README.md>]"
 
 help_usage "$@"
 
 max_args 1 "$@"
 
-readme="${1:-README.md}"
+markdown_file="${1:-README.md}"
 
 indent_width=2
 
+if ! [ -f "$markdown_file" ]; then
+    die "File not found: $markdown_file"
+fi
+
 # tail -n +2 takes off the first line which is the header we definitely don't want in the index
-grep '^#' "$readme" |
+grep '^#' "$markdown_file" |
 tail -n +2 |
 # don't include main headings
 #sed '/^#[[:space:]]/d' |
