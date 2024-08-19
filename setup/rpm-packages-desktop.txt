@@ -82,6 +82,7 @@ hexedit
 hexyl  # hex viewer - https://github.com/sharkdp/hexyl
 honeyd
 hostapd
+ImageMagick
 incron
 iozone
 iotop
@@ -145,6 +146,7 @@ pastebinit
 pdfgrep
 PEAR-PHP_Shell
 perl-doc
+perl-Image-ExifTool
 pidgin
 pidgin-sipe
 pigz  # parallel gzip

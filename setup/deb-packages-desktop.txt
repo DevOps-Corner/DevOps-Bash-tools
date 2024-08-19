@@ -94,6 +94,7 @@ ethstatus
 ethtool
 ettercap-gtk
 evince
+exiv2  # view image metadata
 fcrackzip
 figlet
 filelight
@@ -138,6 +139,7 @@ hunt
 iceweasel
 ifstat
 ike-scan
+imagemagick
 incron
 iotop
 iozone
@@ -164,6 +166,7 @@ ldap-utils
 ldapscripts
 ldapvi
 libc6-dev
+libimage-exiftool-perl
 liblist-allutils-perl
 liblist-moreutils-perl
 libnet-cidr-perl

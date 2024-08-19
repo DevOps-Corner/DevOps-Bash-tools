@@ -95,6 +95,8 @@ e2fsprogs
 eksctl
 expect
 etcd
+exiftool  # view image metadata
+exiv2     # view image metadata
 #ext4fuse  # to read Linux partitions eg. on external hard drives
 ffmpeg
 fish
@@ -255,6 +257,7 @@ ssllabs-scan
 sslscan
 ssh-copy-id
 stats  # fancier Activity Monitor
+#steghide  # looks like it's been removed
 #subversion  # pulls in brew version of Perl which breaks library installations due to this horror - https://github.com/toddr/IO-Tty/issues/25
 #terraform  # use tfenv with direnv to match your company's version and avoid accidentally upgrading the tfstate
 #terragrunt  # old, use install/install_terragrunt.sh to grab latest version to ~/bin instead
