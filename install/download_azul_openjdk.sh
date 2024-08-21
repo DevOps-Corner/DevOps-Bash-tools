@@ -22,7 +22,7 @@ srcdir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # shellcheck disable=SC2034,SC2154
 usage_description="
-Downloads OpenJDK version for Linux x86_64
+Downloads Azul OpenJDK version for Linux x86_64
 
 If Java version is not specified, automatically determines latest version to download
 "
@@ -43,30 +43,31 @@ if is_mac; then
 	}
 fi
 
+url_base="https://cdn.azul.com/zulu/bin"
+
+timestamp "Fetching directory listing of versions from: $url_base/"
+timestamp "(slow, takes 30 seconds due to large listing, please wait)"
+directory_listing="$(curl -sS "$url_base/")"
+
 if is_blank "$java_version"; then
     timestamp "Java version not specified, attempting to find latest JDK version"
-    timestamp "Fetching downloads page"
-    # super brittle to pass a web page that will change so just take the first JDK number which is likely to be the production release
-    download_page="$(curl -sS "https://jdk.java.net/")"
-    timestamp "Parsing downloads page"
-    java_version="$(grep -P -o -m 1 'JDK \K\d+' <<< "$download_page" || die "Failed to parse JDK version out of web page")"
+    # super brittle to pass a web page that will change
+    versions="$(grep -P -o 'jdk\K\d+' <<< "$directory_listing" || die "Failed to parse JDK versions out of directory listing")"
+    java_version="$(sort -nr <<< "$versions" | head -n1 || :)"
+    is_blank "$java_version" && die "Failed to parse JDK version from list of versions"
     timestamp "Determined latest JDK version to be $java_version"
 fi
 
-java_version_url="https://jdk.java.net/java-se-ri/$java_version"
+timestamp "Parsing download path from directory listing"
+# links are relative
+download_paths="$(grep -Eo -e "/zulu/bin/zulu${java_version}[^>]+jdk[^>]+-linux_x64.tar.gz" \
+                           -e "/zulu/bin/zulu[^>]+jdk${java_version}[^>]*-linux_x64.tar.gz" \
+                           <<< "$directory_listing" |
+                  grep -v beta ||
+                  die "Failed to parse download URL for version $java_version")"
+download_path="$(tail -n1 <<< "$download_paths" | sed 's|/zulu/bin/||')"
 
-if [ "$java_version" = 8 ]; then
-    java_version_url+="-MR6"
-elif [ "$java_version" = 11 ]; then
-    java_version_url+="-MR3"
-elif [ "$java_version" = 17 ]; then
-    java_version_url+="-MR1"
-fi
-
-timestamp "Parsing download URL from Java version URL: $java_version_url"
-download_page="$(curl -sS "$java_version_url")"
-download_url="$(grep -Eom1 "https://download.java.net/openjdk/(open)?jdk$java_version.+linux-x64.*.tar.gz" <<< "$download_page" ||
-                die "Failed to parse download URL")"
+download_url="$url_base/$download_path"
 
 timestamp "Downloading $download_url"
 wget -c "$download_url"
