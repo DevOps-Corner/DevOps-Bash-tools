@@ -40,14 +40,14 @@ Requires kubectl to be installed and configured
 
 # used by usage() in lib/utils.sh
 # shellcheck disable=SC2034
-usage_args="[<regex> <namespace>]"
+usage_args="[<namespace> <pod_name_regex>]"
 
 help_usage "$@"
 
 max_args 2 "$@"
 
-regex="${1:-}"
-namespace="${2:-}"
+namespace="${1:-}"
+regex="${2:-.}"
 
 kube_config_isolate
 
@@ -63,7 +63,7 @@ grep -E "$regex" |
 while read -r pod; do
     echo
     timestamp "Dumping pod log: $pod"
-    output_file="kubectl-pod-log.$(date '+%F_%H%S').$pod.txt"
+    output_file="kubectl-pod-log.$(date '+%F_%H%M').$pod.txt"
     kubectl logs "$pod" > "$output_file"
     timestamp "Dumped pod log to file: $output_file"
 done
