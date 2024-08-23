@@ -274,6 +274,8 @@ if has("autocmd")
     " for scripts that don't end in .sh like Google Cloud Shell's .customize_environment
     au FileType sh                        nmap ;l :w<CR>:!clear; cd "%:p:h" && shellcheck -x -Calways "%:t" \| more -R<CR>
 
+    au BufNewFile,BufRead .vimrc    nmap ;l :w<CR> :!clear<CR> :call LintVimrc() <CR>
+
     " these tools are in the https://github.com/HariSekhon/DevOps-Python-tools & DevOps-Bash-tools repos which should be downloaded, run 'make' and add to $PATH
     au BufNew,BufRead *.csv        nmap ;l :w<CR>:!clear; validate_csv.py "%"<CR>
     au BufNew,BufRead *.cson       nmap ;l :w<CR>:!clear; validate_cson.py "%"<CR>
@@ -361,6 +363,7 @@ nmap          ;k :w<CR> :! check_kubernetes_yaml.sh "%" <CR>
 " done automatically on write now
 "nmap <silent> ;' :call StripTrailingWhiteSpace()<CR>
 nmap <silent> ;' :w<CR> :!clear; git diff "%" <CR>
+nmap          ;m :w<CR> :call MarkdownIndex() <CR>
 nmap          ;n :w<CR> :n<CR>
 nmap          ;o :!cd "%:p:h" && git log -p "%:t" <CR>
 nmap          ;O :call ToggleGutter()<CR>
@@ -379,14 +382,14 @@ nmap <silent> ;s :,!sqlcase.pl<CR>
 "nmap          ;; :call HgGitU()<CR>
 " command not found
 "nmap          ;; :! . ~/.bashrc; gitu "%" <CR>
-nmap          ;; :w<CR> :! bash -ic 'gitu "%"' <CR>
-nmap          ;/ :w<CR> :! bash -ic 'add "%"' <CR>
-nmap          ;g :w<CR> :! bash -ic 'cd "%:p:h" && st' <CR>
-nmap          ;G :w<CR> :! bash -ic 'cd "%:p:h" && git log -p "%:t"' <CR>
-"nmap          ;L :w<CR> :! bash -ic 'cd "%:p:h" && git log -p' <CR>
-nmap          ;L :w<CR> :! lint.sh %<CR>
-nmap          ;. :w<CR> :! bash -ic 'cd "%:p:h" && pull' <CR>
-nmap          ;[ :w<CR> :! bash -ic 'cd "%:p:h" && push' <CR>
+nmap          ;; :w<CR> :call GitUpdateCommit() <CR>
+nmap          ;/ :w<CR> :call GitAddCommit() <CR>
+nmap          ;g :w<CR> :call GitStatus() <CR>
+nmap          ;G :w<CR> :call GitLogP() <CR>
+nmap          ;L :w<CR> :! lint.sh % <CR>
+nmap          ;. :w<CR> :call GitPull() <CR>
+nmap          ;[ :w<CR> :call GitPush() <CR>
+nmap          ;, :w<CR> :s/^/</ <CR> :s/$/>/ <CR>
 " write then grep all URLs that are not mine, followed by all URLs that are mine in reverse order to urlview
 " this is so that 3rd party URLs followed by my URLs from within the body of files get higher priority than my header links
 nmap <silent> ;u :w<CR> :! bash -c 'grep -vi harisekhon "%" ; grep -i harisekhon "%" \| tail -r' \| urlview <CR> :<CR>
@@ -451,6 +454,33 @@ if ! exists("*SourceVimrc")
         :set ts sts sw et filetype
     endfunction
 endif
+
+":! bash -c 'vim -c "source %" -c "q" && echo "ViM basic lint validation passed" || "ViM basic lint validation failed"'
+"":! if type -P vint &>/dev/null; then vint "%"; fi
+function! LintVimrc()
+  let l:vimrc_path = expand('~/.vimrc')
+
+  echo "Sourcing ~/.vimrc file..."
+  try
+    execute 'source' l:vimrc_path
+    echohl InfoMsg | echo "No syntax errors found in .vimrc." | echohl None
+  catch
+    echohl ErrorMsg | echo "Error found in .vimrc while sourcing." | echohl None
+    return
+  endtry
+
+  if executable('vint')
+    echo "Running vint..."
+    let l:vint_output = system('vint ' . l:vimrc_path)
+    if v:shell_error
+      echohl ErrorMsg | echo l:vint_output | echohl None
+    else
+      echohl InfoMsg | echo "No linting issues found by vint." | echohl None
+    endif
+  else
+    echohl WarningMsg | echo "vint is not installed or not found in PATH." | echohl None
+  endif
+endfunction
 
 function! ToggleSyntax()
     if exists("g:syntax_on")
@@ -533,6 +563,43 @@ endfunction
 :command! JHr :normal a// <ESC>74a=<ESC>a //<ESC>
 
 :command! Done :normal 37a=<ESC>a DONE <ESC>37a=<ESC>
+
+" ============================================================================ "
+"                            G i t   F u n c t i o n s
+" ============================================================================ "
+
+" works better than a straight nmap which sometimes fails to execute and re-sourcing .vimrc doesn't solve it
+" without exiting vim - this is buggy behaviour that doesn't seem to happen when using functions instead
+
+function! GitUpdateCommit()
+    :! bash -ic 'cd "%:p:h" && gitu "%:t" '
+endfunction
+
+function! GitAddCommit()
+     ! bash -ic 'add "%"'
+endfunction
+
+function! GitStatus()
+    :! bash -ic 'cd "%:p:h" && st'
+endfunction
+
+function! GitLogP()
+    :! bash -ic 'cd "%:p:h" && git log -p "%:t"'
+endfunction
+
+function! GitPull()
+    :! bash -ic 'cd "%:p:h" && pull'
+endfunction
+
+function! GitPush()
+    :! bash -ic 'cd "%:p:h" && push'
+endfunction
+
+" ============================================================================ "
+
+function! MarkdownIndex()
+    :! markdown_replace_index.sh "%"
+endfunction
 
 " superceded by anonymize.py from DevOps Python tools repo, called via hotkey ;a declared above
 ":function RemoveIPs()

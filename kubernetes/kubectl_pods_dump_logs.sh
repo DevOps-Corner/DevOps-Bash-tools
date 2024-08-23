@@ -47,7 +47,7 @@ help_usage "$@"
 max_args 2 "$@"
 
 namespace="${1:-}"
-regex="${2:-.}"
+pod_name_regex="${2:-.}"
 
 kube_config_isolate
 
@@ -59,11 +59,16 @@ fi
 
 kubectl get pods -o name |
 sed 's|pod/||' |
-grep -E "$regex" |
+grep -E "$pod_name_regex" |
 while read -r pod; do
     echo
-    timestamp "Dumping pod log: $pod"
-    output_file="kubectl-pod-log.$(date '+%F_%H%M').$pod.txt"
-    kubectl logs "$pod" > "$output_file"
-    timestamp "Dumped pod log to file: $output_file"
+    # ignore && && || it works
+    # shellcheck disable=SC2015
+    timestamp "Dumping pod log: $pod" &&
+    output_file="kubectl-pod-log.$(date '+%F_%H%M').$pod.txt" &&
+    kubectl logs "$pod" > "$output_file" &&
+    timestamp "Dumped pod log to file: $output_file" ||
+    warn "Failed to collect log for pod '$pod'"
+    # XXX: because race condition - pods can go away during execution and we still want to collect the rest of the pods
 done
+timestamp "Log dumps completed"
