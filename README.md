@@ -288,6 +288,7 @@ Top-level `.bashrc`, `bin/`, `.bash.d/` and `configs/` directories:
 - `login.sh` - logs to major Cloud platforms if their credentials are found in the environment, CLIs such as AWS, GCP, Azure, GitHub... Docker registries: DockerHub, GHCR, ECR, GCR, GAR, ACR, Gitlab, Quay...
 - `clean_caches.sh` - cleans out OS package and programming language caches - useful to save space or reduce Docker image size
 - `delete_duplicate_files.sh` - deletes duplicate files with (N) suffixes, commonly caused by web browser downloads,
+- `dump_stats.sh` - dumps common command outputs to text files in a local tarball. Useful to collect support information for vendor support cases
   in the given or current directory. Checks they're exact duplicates of a matching basename file without the (N) suffix with
   the exact same checksum for safety. Prompts to delete per file. To auto-accept deletions, do
   `yes | delete_duplicate_files.sh`. This is a fast way of cleaning up your `~/Downloads` directory and can be put your
@@ -313,6 +314,8 @@ Top-level `.bashrc`, `bin/`, `.bash.d/` and `configs/` directories:
 - `shred_file.sh` - overwrites a file 7 times to DoD standards before deleting it to prevent recovery of sensitive information
 - `shred_free_space.sh` - overwrites free space to prevent recovery of sensitive information for files that have already been deleted
 - `split.sh` - split large files into N parts (defaults to the number of your CPU cores) to parallelize operations on them
+- `ssh_dump_stats.sh` - uses SSH and `dump_stats.sh` to dump common command outputs from remote servers to a local tarball. Useful for vendor support cases
+- `ssh_dump_logs.sh` - Uses SSH to dump logs from server to local text files for uploading to vendor support cases
 - `ssl_get_cert.sh` - gets a remote `host:port` server's SSL cert in a format you can pipe, save and use locally, for example in Java truststores
 - `ssl_verify_cert.sh` - verifies a remote SSL certificate (battle tested more feature-rich version `check_ssl_cert.pl` exists in the [Advanced Nagios Plugins](https://github.com/HariSekhon/Nagios-Plugins) repo)
 - `ssl_verify_cert_by_ip.sh` - verifies SSL certificates on specific IP addresses, useful to test SSL source addresses for CDNs, such as Cloudflare Proxied sources before enabling SSL Full-Strict Mode for end-to-end, or Kubernetes ingresses (see also `curl_k8s_ingress.sh`)
@@ -369,6 +372,8 @@ and [Mac](https://github.com/HariSekhon/Knowledge-Base/blob/main/linux.md).
   - `aws_config_recording.sh` - lists [AWS Config](https://aws.amazon.com/config/) recorders, their recording status (should be true) and their last status (should be success)
   - `aws_csv_creds.sh` - prints AWS credentials from a CSV file as shell export statements. Useful to quickly switch your shell to some exported credentials from a service account for testing permissions or pipe to upload to a CI/CD system via an API (eg. `jenkins_cred_add*.sh`, `github_actions_repo*_set_secret.sh`, `gitlab_*_set_env_vars.sh`, `circleci_*_set_env_vars.sh`, `bitbucket_*_set_env_vars.sh`, `terraform_cloud_*_set_vars.sh`, `kubectl_kv_to_secret.sh`). Supports new user and new access key csv file formats.
   - `aws_codecommit_csv_creds.sh` - prints AWS [CodeCommit](https://aws.amazon.com/codecommit/) Git credentials from a CSV file as shell export statements. Similar use case and chaining as above
+  - `aws_ec2_list_instance_states.sh` - quickly list AWS EC2 instances and their states in an easy to read table output
+  - `aws_ec2_terminate_instance_by_name.sh` - terminate an AWS EC2 instance by name
   - `aws_ec2_ebs_*.sh` - AWS EC2 [EBS](https://aws.amazon.com/ebs/) scripts:
     - `aws_ec2_ebs_volumes.sh` - list EC2 instances and their EBS volumes in the current region
     - `aws_ec2_ebs_create_snapshot_and_wait.sh - creates a snapshot of a given EBS volume ID and waits for it to complete with exponential backoff
@@ -421,6 +426,7 @@ and [Mac](https://github.com/HariSekhon/Knowledge-Base/blob/main/linux.md).
   - `aws_meta.sh` - AWS [EC2 Metadata API](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-metadata.html) query shortcut. See also the official [ec2-metadata](https://aws.amazon.com/code/ec2-instance-metadata-query-tool/) shell script with more features
   - `aws_nat_gateways_public_ips.sh` - lists the public IPs of all NAT gateways. Useful to give to clients to permit through firewalls for webhooks or similar calls
   - `aws_rds_open_port_to_my_ip.sh` - adds a security group to an RDS DB instance to open its native database SQL port to your public IP address
+  - `aws_rds_get_version.sh` - quickly retrieve the version of an RDS database to know which JDBC jar version to download using `install/download_*_jdbc.sh` when setting up connections
   - `aws_route53_check_ns_records.sh` - checks AWS [Route 53](https://aws.amazon.com/route53/) public hosted zones NS servers are delegated in the public DNS hierarchy and that there are no rogue NS servers delegated not matching the Route 53 zone configuration
   - `aws_sso_env_creds.sh` - retrieves AWS SSO session credentials in the format of environment export commands for copying to other systems like Terraform Cloud
   - `aws_s3_bucket.sh` - creates an S3 bucket, blocks public access, enables versioning, encryption, and optionally locks out any given user/group/role ARNs via a bucket policy for safety (eg. to stop Power Users accessing a sensitive bucket like Terraform state)
@@ -739,6 +745,8 @@ See also [Knowledge Base notes for Hadoop](https://github.com/HariSekhon/Knowled
 
 - `git/*.sh` - [Git](https://git-scm.com/) scripts:
   - `precommit_run_changed_files.sh` - runs pre-commit on all files changed on the current branch vs the default branch. Useful to reproduce `pre-commit` checks that are failing in pull requests to get your PRs to pass
+  - `git_branch_delete_squash_merged.sh` - carefully detects if a squash merged branch you want to delete has no changes with the default trunk branch before deleting it.
+     See [Squash Merges](https://github.com/HariSekhon/Knowledge-Base/blob/main/git.md#squash-merges-require-force-deleting-branches) in knowledge-base about why this is necessary.
   - `git_foreach_branch.sh` - executes a command on all branches (useful in heavily version branched repos like in my [Dockerfiles](https://github.com/HariSekhon/Dockerfiles) repo)
   - `git_foreach_repo.sh` - executes a command against all adjacent repos from a given repolist (used heavily by many adjacent scripts)
   - `git_foreach_modified.sh` - executes a command against each file with git modified status

@@ -22,37 +22,40 @@ srcdir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # shellcheck disable=SC2034,SC2154
 usage_description="
-Quickly determines and downloads latest PostgreSQL JDBC jar or an explicitly given version
+Quickly determines and downloads latest Microsoft SQL Server JDBC jar or an explicitly given version
 
 Useful to get the jar to upload to data integration 3rd party directories or Docker images or Kubernetes
 
 Version defaults to 'latest' in which case it determines the latest version from GitHub releases
+
+JRE version defaults to 8
 "
 
 # used by usage() in lib/utils.sh
 # shellcheck disable=SC2034
-usage_args="[<version>]"
+usage_args="[<version> <jre_version>]"
 
 #version="${1:-42.2.18}"
 version="${1:-latest}"
+jre_version="${2:-8}"
 
-github_owner_repo="pgjdbc/pgjdbc"
+github_owner_repo="microsoft/mssql-jdbc"
 
 if [ "$version" = latest ]; then
-    timestamp "Determining latest version of PostgreSQL JDBC driver available"
+    timestamp "Determining latest version of Microsoft SQL Server JDBC driver available"
     version="$(github_repo_latest_release.sh "$github_owner_repo")"
-    version="${version#REL}"
-    timestamp "Determined latest version of PostgreSQL JDBC driver to be version '$version'"
+    version="${version#v}"
+    timestamp "Determined latest version of Microsoft SQL Server JDBC driver to be version '$version'"
 fi
 
 # avoid race condition between different sites updating at different times and pull from GitHub releases where we determined latest version to be from
 #download_url="https://jdbc.postgresql.org/download/postgresql-$version.jar"
-download_url="https://github.com/$github_owner_repo/releases/download/REL$version/postgresql-$version.jar"
+download_url="https://github.com/$github_owner_repo/releases/download/v$version/mssql-jdbc-$version.jre$jre_version.jar"
 
-timestamp "Downloading PostgreSQL JDBC version '$version' from $download_url"
+timestamp "Downloading Microsoft SQL Server JDBC version '$version' from $download_url"
 echo >&2
 
-jar="postgresql-jdbc-$version.jar"
+jar="mssql-jdbc-$version.jre$jre_version.jar"
 
 if type -P wget &>/dev/null; then
     wget -cO "$jar" "$download_url"
