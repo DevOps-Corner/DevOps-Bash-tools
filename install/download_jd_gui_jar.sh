@@ -35,29 +35,4 @@ version="${1:-latest}"
 
 github_owner_repo="java-decompiler/jd-gui"
 
-if [ "$version" = latest ]; then
-    timestamp "Determining latest version of Java Decompiler JD GUI available"
-    version="$(github_repo_latest_release.sh "$github_owner_repo")"
-    version="${version#v}"
-    timestamp "Determined latest version of Java Decompiler JD GUI to be version '$version'"
-fi
-
-# avoid race condition between different sites updating at different times and pull from GitHub releases where we determined latest version to be from
-#download_url="https://jdbc.postgresql.org/download/postgresql-$version.jar"
-download_url="https://github.com/$github_owner_repo/releases/download/v$version/jd-gui-$version-min.jar"
-
-timestamp "Downloading Java Decompiler JD GUI version '$version' from: $download_url"
-echo >&2
-
-jar="jd-gui-$version-min.jar"
-
-if type -P wget &>/dev/null; then
-    wget -cO "$jar" "$download_url"
-else
-    tmpfile="$(mktemp)"
-    curl --fail "$download_url" > "$tmpfile"
-    unalias mv &>/dev/null || :
-    mv -fv "$tmpfile" "$jar"
-fi
-
-timestamp "Download complete: $jar"
+"$srcdir/../github/github_download_release_jar.sh" "https://github.com/$github_owner_repo/releases/download/v{version}/jd-gui-{version}-min.jar" "$version"

@@ -2,9 +2,9 @@
 #  vim:ts=4:sts=4:sw=4:et
 #
 #  Author: Hari Sekhon
-#  Date: 2024-08-28 20:57:31 +0200 (Wed, 28 Aug 2024)
+#  Date: 2024-08-28 23:03:58 +0200 (Wed, 28 Aug 2024)
 #
-#  https://github.com/HariSekhon/DevOps-Bash-tools
+#  https///github.com/HariSekhon/DevOps-Bash-tools
 #
 #  License: see accompanying Hari Sekhon LICENSE file
 #
@@ -18,21 +18,31 @@ set -euo pipefail
 srcdir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # shellcheck disable=SC1090,SC1091
-. "$srcdir/../lib/utils.sh"
+. "$srcdir/lib/utils.sh"
 
 # shellcheck disable=SC2034,SC2154
 usage_description="
-Quickly determines and downloads latest CFR java command line decompiler jar or an explicitly given version
-
-Version defaults to 'latest' in which case it determines the latest version from GitHub releases
+Wrapper to download and run the Procyon command line java decompiler
 "
 
 # used by usage() in lib/utils.sh
 # shellcheck disable=SC2034
-usage_args="[<version>]"
+usage_args="<jar_or_java.class>"
 
-version="${1:-latest}"
+# let see the help from tool instead
+#help_usage "$@"
 
-github_owner_repo="leibnitz27/cfr"
+min_args 1 "$@"
 
-"$srcdir/../github/github_download_release_jar.sh" "https://github.com/$github_owner_repo/releases/download/{version}/cfr-{version}.jar"
+procyon_jar="$srcdir/procyon.jar"
+
+if ! [ -f "$procyon_jar" ]; then
+    pushd "$srcdir"
+    ../install/download_procyon_jar.sh
+    timestamp
+    echo -n "Symlinking: " >&2
+    ln -sv procyon-*.jar procyon.jar
+    popd
+fi
+
+java -jar "$procyon_jar" "$@"

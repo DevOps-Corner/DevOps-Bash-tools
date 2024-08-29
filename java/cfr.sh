@@ -22,7 +22,7 @@ srcdir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # shellcheck disable=SC2034,SC2154
 usage_description="
-Wrapper to download and run CFR the command line java decompiler
+Wrapper to download and run the CFR command line java decompiler
 
 Examples:
 
@@ -35,15 +35,20 @@ Examples:
 # shellcheck disable=SC2034
 usage_args="<jar_or_java.class>"
 
-help_usage "$@"
+# let see the help from tool instead
+#help_usage "$@"
 
 min_args 1 "$@"
 
-if ! [ -f "$srcdir/cfr.jar" ]; then
+cfr_jar="$srcdir/cfr.jar"
+
+if ! [ -f "$cfr_jar" ]; then
     pushd "$srcdir"
     ../install/download_cfr_jar.sh
+    timestamp
+    echo -n "Symlinking: " >&2
     ln -sv cfr-*.jar cfr.jar
     popd
 fi
 
-java -jar "$srcdir/cfr.jar" "$@"
+java -jar "$cfr_jar" "$@"
