@@ -66,11 +66,22 @@ while read -r pod; do
     # shellcheck disable=SC2015
     timestamp "Running stats commands on pod: $pod" &&
     output_file="kubectl-pod-stats.$(date '+%F_%H%M').$pod.txt" &&
-    echo &&
     # Copied from ../bin/dump_stats.sh for servers
     #
     # Most of these won't be available inside a pod, but we can only try...
+    #
+    # exec'ing stderr to be send to stdout to be captured in the log sections of why the stats are not available eg.
+    #
+    #   bash: line 25: iostat: command not found
+    #   bash: line 35: mpstat: command not found
+    #   bash: line 39: sar: command not found
+    #   bash: line 44: sar: command not found
+    #   bash: line 68: netstat: command not found
+    #   bash: line 73: lsof: command not found
+    #
     kubectl exec "$pod" -- bash -c '
+        exec 2>&1
+
         echo "Dumping common command outputs"
         echo
         echo "Disk Space:"
@@ -109,6 +120,7 @@ while read -r pod; do
         echo
         echo
         echo "SAR 1 sec intervals x 5:"
+        echo
         sar -u 1 5
         echo
         echo
@@ -118,6 +130,7 @@ while read -r pod; do
         echo
         echo
         echo "Top snapshot with Threads:"
+        echo
         top -H -b -n 1
         echo
         echo
@@ -131,7 +144,7 @@ while read -r pod; do
         ps -ef
         echo
         echo
-        echo "ps auxf:"
+        echo "Process List Alternative - ps auxf:"
         echo
         ps auxf
         echo

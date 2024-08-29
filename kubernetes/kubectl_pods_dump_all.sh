@@ -39,18 +39,18 @@ Requires kubectl to be installed and configured
 
 # used by usage() in lib/utils.sh
 # shellcheck disable=SC2034
-usage_args="[<num_iterations> <interval_seconds> <namespace> <pod_name_regex> <jdk>]"
+usage_args="<jdk> [<num_iterations> <interval_seconds> <namespace> <pod_name_regex>]"
 
 help_usage "$@"
 
 min_args 0 "$@"
 max_args 5 "$@"
 
-num_iterations="${1:-1}"
-interval_seconds="${2:-300}"
-namespace="${3:-}"
-pod_name_regex="${4:-.}"
-jdk="${5:-}"
+jdk="$1"
+num_iterations="${2:-1}"
+interval_seconds="${3:-300}"
+namespace="${4:-}"
+pod_name_regex="${5:-.}"
 
 if ! is_int "$num_iterations"; then
     die "First arg - num_iterations - must be an integer!"
@@ -63,6 +63,15 @@ fi
 if ! [ "$interval_seconds" -gt 0 ]; then
     die "Second arg - interval_seconds - must be an integer greater than zero!"
 fi
+
+# canonicalize to full path so we can find it from a new support-bundle dir
+jdk="$(readlink -f "$jdk")"
+
+support_bundle_dir="support-bundle-$(date '+%F_%H%M')"
+
+mkdir -p -v "$support_bundle_dir"
+
+cd "$support_bundle_dir"
 
 if [ -n "$jdk" ]; then
     if ! [ -f "$jdk/bin/jstack" ]; then
@@ -97,3 +106,10 @@ for ((i=1; i <= num_iterations; i++)); do
     echo
 done
 timestamp "All dump iterations completed"
+echo >&2
+timestamp "Tarring $support_bundle_dir"
+cd ..
+tarball="$support_bundle_dir.tar.gz"
+tar czvf "$tarball" "$support_bundle_dir"
+echo >&2
+timestamp "Support bundle ready: $tarball"
