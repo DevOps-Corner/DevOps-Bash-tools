@@ -32,6 +32,8 @@ a more specific key=value kubernetes label (the latter is preferable)
 
 If more than one matching pod is found, prompts with an interactive dialogue to choose one
 
+If more than one pod port is found, you must specify the environment variable POD_PORT instead
+
 If OPEN_URL environment variable is set and this script is not run over SSH then automatically
 opens the UI on localhost URL in the default browser
 "
@@ -46,21 +48,38 @@ max_args 2 "$@"
 
 namespace="${1:-}"
 filter="${2:-}"
-filter_label=()
+#filter_label=()
+filter_label=""
 grep_filter=""
 
-kube_config_isolate
-
 if [[ "$filter" =~ = ]]; then
-    filter_label=(-l "$filter")
+    #filter_label=(-l "$filter")
+    #
+    # this works on Bash 3 set -u but breaks on Bash 4
+    #
+    #   "${filter_label[@]}"
+    #
+    # the fix on Bash 4 is
+    #
+    #   "${filter_label[@:-]}"
+    #
+    # but that isn't recognized on Bash 3
+    #
+    # portable workaround, convert to string and don't quote
+    #
+    filter_label="-l $filter"
 elif [ -n "$filter" ]; then
     grep_filter="$filter"
 fi
 
+kube_config_isolate
+
 timestamp "Getting pods that match filter '$filter'"
+# need splitting due to above behavioural difference between Bash 3 and Bash 4
+# shellcheck disable=SC2086
 pods="$(
     kubectl get pods ${namespace:+-n "$namespace"} \
-                     "${filter_label[@]}" \
+                     $filter_label \
                      --field-selector=status.phase=Running |
     if [ -n "$grep_filter" ]; then
         grep -E "$grep_filter"
@@ -95,12 +114,33 @@ else
     die "ERROR: No matching pods found"
 fi
 
-pod_port="$(kubectl get pod  ${namespace:+-n "$namespace"} "$pod" -o jsonpath='{.spec.containers[*].ports[*].containerPort}')"
+if [ -n "${POD_PORT:-}" ]; then
+    if ! is_port "$POD_PORT"; then
+        die "Environment variable POD_PORT must be a valid port number integer"
+    fi
+else
+    pod_port="$(kubectl get pod  ${namespace:+-n "$namespace"} "$pod" -o jsonpath='{.spec.containers[*].ports[*].containerPort}')"
+fi
 
 if [ -z "$pod_port" ]; then
     die "Failed to determine port for pod '$pod'"
 fi
 
+if [ "$(awk '{print NF}' <<< "$pod_port")" -gt 1 ]; then
+    die "More than one port returned from pod '$pod', must specify POD_PORT environment variable instead"
+fi
+
+local_port="$pod_port"
+
+if [ "$local_port" -lt 1024 ]; then
+    if [ "$local_port" = 80 ]; then
+        local_port=8080
+    elif [ "$local_port" = 443 ]; then
+        local_port=8443
+    else
+        local_port="$((local_port + 1000))"
+    fi
+fi
 local_port="$(next_available_port "$pod_port")"
 
 timestamp "Launching port forwarding to pod '$pod' port '$pod_port' to local port '$local_port'"
