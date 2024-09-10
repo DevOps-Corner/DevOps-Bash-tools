@@ -143,6 +143,8 @@ Plugin 'terrastruct/d2-vim'
 Plugin 'tpope/vim-fugitive'
 Plugin 'tpope/vim-surround'
 Plugin 'tmux-plugins/vim-tmux'
+" https://github.com/motus/pig.vim
+"Bundle "motus/pig.vim"
 
 " comment at start of line instead of code indentation level
 " doesn't work: https://github.com/preservim/nerdcommenter/issues/467
@@ -573,7 +575,8 @@ endfunction
 " without exiting vim - this is buggy behaviour that doesn't seem to happen when using functions instead
 
 function! GitUpdateCommit()
-    :! bash -ic 'cd "%:p:h" && gitu "%:t" '
+    ":! bash -ic 'cd "%:p:h" && gitu "%:t" '
+    :! git_diff_commit.sh "%"
 endfunction
 
 function! GitAddCommit()
