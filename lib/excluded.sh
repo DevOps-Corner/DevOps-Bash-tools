@@ -53,19 +53,21 @@ isExcluded(){
             return 0
         fi
     fi
-    if ! uname -s | grep -q Darwin; then
+    # optimization to avoid fork
+    #if ! uname -s | grep -q Darwin; then
+    if ! [[ "${OSTYPE:-}" == darwin* ]]; then
         if [[ "$prog" =~ /applescript/ ]]; then
             return 0
         fi
     fi
     # this external git check is expensive, skip it when in CI as using fresh git checkouts
-    is_CI && return 1
-    # shellcheck disable=SC2230
-    if type -P git &>/dev/null; then
-        commit="$(git log "$prog" 2>/dev/null | head -n1 | grep 'commit' || :)"
-        if [ -z "$commit" ]; then
-            return 0
-        fi
-    fi
+    #is_CI && return 1
+    ## shellcheck disable=SC2230
+    #if type -P git &>/dev/null; then
+    #    commit="$(git log "$prog" 2>/dev/null | head -n1 | grep 'commit' || :)"
+    #    if [ -z "$commit" ]; then
+    #        return 0
+    #    fi
+    #fi
     return 1
 }
