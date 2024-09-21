@@ -17,7 +17,29 @@ set -euo pipefail
 [ -n "${DEBUG:-}" ] && set -x
 srcdir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+# shellcheck disable=SC1090,SC1091
+. "$srcdir/lib/utils.sh"
+
+# shellcheck disable=SC2034,SC2154
+usage_description="
+Syncs configs listed in ../setup/files.txt to all adjacent repo checkouts listed in ../setup/repos.txt
+
+Quick way of updating dotfile configs between repos
+
+and then using ../git/github_foreach_repo.sh to commit them
+"
+
+# used by usage() in lib/utils.sh
+# shellcheck disable=SC2034
+usage_args=""
+
+help_usage "$@"
+
+num_args 0 "$@"
+
 cd "$srcdir/.."
+
+tmpfile="$(mktemp)"
 
 if [ -n "$*" ]; then
     echo "$@"
@@ -32,7 +54,7 @@ while read -r repo dir; do
         dir="$(tr '[:upper:]' '[:lower:]' <<< "$repo")"
     fi
     if ! [ -d "../$dir" ]; then
-        echo "WARNING: repo dir $dir not found, skipping..."
+        timestamp "WARNING: repo dir $dir not found, skipping..."
         continue
     fi
     sed 's/#.*//; /^[[:space:]]*$/d' "$srcdir/../setup/files.txt" |
@@ -46,12 +68,23 @@ while read -r repo dir; do
         else
             continue
         fi
-        mkdir -pv "${target%/*}"
         if [ -f "$filename" ]; then
-            echo "syncing $filename -> $target"
-            perl -pe "s/(devops-)*bash-tools/$repo/i" "$filename" > "$target"
+            perl -pe "s/(devops-)*bash-tools/$repo/i" "$filename" > "$tmpfile"
+            tmpfile_checksum="$(cksum "$tmpfile" | awk '{print $1}')"
+            target_checksum="$(cksum "$target" | awk '{print $1}')"
+            if [ "$tmpfile_checksum" = "$target_checksum" ]; then
+                log "Skipping Config Sync for file due to same checksum: $filename"
+                continue
+            fi
+            if ! QUIET=1 "$srcdir/../bin/diff_line_threshold.sh" "$filename" "$target"; then
+                timestamp "Skipping Config Sync for file due to large diff: $filename"
+                continue
+            fi
+            mkdir -pv "${target%/*}"
+            timestamp "Syncing $filename -> $target"
+            mv "$tmpfile" "$target"
         else
-            echo "file not found: $filename. Skipping..."
+            timestamp "File not found: $filename. Skipping..."
         fi
     done
     direnv allow "../$dir"
