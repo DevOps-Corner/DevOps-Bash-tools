@@ -30,3 +30,6 @@ python3
 python-pip
 python3-pip
 python-setuptools # needed by 'pip install awscli'
+
+# only available from Debian 12 and Ubuntu 22.04
+pre-commit

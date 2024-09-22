@@ -303,6 +303,7 @@ Top-level `.bashrc`, `bin/`, `.bash.d/` and `configs/` directories:
 - `image_join_stack.sh` - stack joins two images after matching their widths so they align correctly
 - `ldapsearch.sh` - shortens `ldapsearch` command by inferring switches from environment variables
 - `ldap_user_recurse.sh` / `ldap_group_recurse.sh` - recurse Active Directory LDAP users upwards to find all parent groups, or groups downwards to find all nested users (useful for debugging LDAP integration and group-based permissions)
+- `linux_distro_versions.sh` - quickly returns the list of major versions for a given Linux distro
 - `log_timestamp_large_intervals.sh` - finds log lines whose timestamp intervals exceed the given number of seconds and outputs those log lines with the difference between the last and current timestamps. Useful to find actions that are taking a long time from log files such as CI/CD logs
 - `diff_line_threshold.sh` - compares two files vs a line count diff threshold to determine if they are radically different. Used to avoid overwriting files which are not mere updates but completely different files
 - `mac_diff_settings.sh` - takes before and after snapshots of UI setting changes and diffs them to make it easy to find `defaults` keys to add to `setup/mac_settings.sh` to save settings
@@ -692,6 +693,7 @@ See also [Knowledge Base notes for Kubernetes](https://github.com/HariSekhon/Kno
   - `dockerhub_api.sh` - queries DockerHub API v2 with or without authentication (`$DOCKERHUB_USER` & `$DOCKERHUB_PASSWORD` / `$DOCKERHUB_TOKEN`)
   - `docker_api.sh` - queries a Docker Registry with optional basic authentication if `$DOCKER_USER` & `$DOCKER_PASSWORD` are set
   - `docker_build_hashref.sh` - runs `docker build` and auto-generates docker image name and tag from relative Git path and commit short SHA hashref and a dirty sha suffix if git contents are modified. Useful to compare docker image sizes between your clean and modified versions of `Dockerfile` or contents
+  - `docker_package_check.sh` - runs package installs on major versions of a docker image to check given packages are available before adding them and breaking builds across linux distro versions
   - `docker_registry_list_images.sh` - lists images in a given private Docker Registry
   - `docker_registry_list_tags.sh` - lists tags for a given image in a private Docker Registry
   - `docker_registry_get_image_manifest.sh` - gets a given image:tag manifest from a private Docker Registry
