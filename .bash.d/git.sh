@@ -165,8 +165,21 @@ alias readmesi='idea $(git_foreach_repo.sh '"'"'echo $PWD/README.md'"')"
 alias ureadmes='git_foreach_repo.sh '"'"'gitu README.md || :'"'"
 
 # equivalent of hg root
+# shellcheck disable=SC2120
 git_root(){
+    local path="${1:-.}"
+    local dir
+    if [ -f "$path" ]; then
+        dir="$(dirname "$path")"
+    elif [ -d "$path" ]; then
+        dir="$path"
+    else
+        echo "ERROR: arg passed is not a regular file or directory: $path" >&2
+        return 1
+    fi
+    pushd "$dir" &>/dev/null || return 1
     git rev-parse --show-toplevel
+    popd &>/dev/null || return 1
 }
 
 gitgc(){
