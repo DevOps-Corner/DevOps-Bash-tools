@@ -302,6 +302,7 @@ Top-level `.bashrc`, `bin/`, `.bash.d/` and `configs/` directories:
 - `find_lock.sh` - tries to find if a lockfile is used in the given or current working directory by taking snapshots of the file list before and after a prompt in which you should open/close an application
 - `http_duplicate_urls.sh` - find duplicate URLs in a given web page
 - `image_join_stack.sh` - stack joins two images after matching their widths so they align correctly
+- `imageopen.sh` - opens the given image file using whatever available tool is found on Linux or Mac
 - `ldapsearch.sh` - shortens `ldapsearch` command by inferring switches from environment variables
 - `ldap_user_recurse.sh` / `ldap_group_recurse.sh` - recurse Active Directory LDAP users upwards to find all parent groups, or groups downwards to find all nested users (useful for debugging LDAP integration and group-based permissions)
 - `linux_distro_versions.sh` - quickly returns the list of major versions for a given Linux distro
@@ -784,6 +785,7 @@ See also [Knowledge Base notes for Hadoop](https://github.com/HariSekhon/Knowled
   - `git_review_push.sh` - shows diff of what would be pushed upstream and prompts to push. Convenient for fast reviewed pushes via vim or IDEs hotkeys
   - `git_branch_delete_squash_merged.sh` - carefully detects if a squash merged branch you want to delete has no changes with the default trunk branch before deleting it.
      See [Squash Merges](https://github.com/HariSekhon/Knowledge-Base/blob/main/git.md#squash-merges-require-force-deleting-branches) in knowledge-base about why this is necessary.
+  - `git_tag_release.sh` - creates a Git tag, auto-incrementing a `.N` suffix on the year/month/day date format if no exact version given
   - `git_foreach_branch.sh` - executes a command on all branches (useful in heavily version branched repos like in my [Dockerfiles](https://github.com/HariSekhon/Dockerfiles) repo)
   - `git_foreach_repo.sh` - executes a command against all adjacent repos from a given repolist (used heavily by many adjacent scripts)
   - `git_foreach_modified.sh` - executes a command against each file with git modified status
@@ -797,10 +799,11 @@ See also [Knowledge Base notes for Hadoop](https://github.com/HariSekhon/Knowled
   - `git_repos_update.sh` - same as above but also runs the `make update` build to install the latest dependencies, leverages the above script
   - `git_grep_env_vars.sh` - find environment variables in the current git repo's code base in the format `SOME_VAR` (useful to find undocumented environment variables in internal or open source projects such as ArgoCD eg. [argoproj/argocd-cd #8680](https://github.com/argoproj/argo-cd/pull/8680))
   - `git_log_empty_commits.sh` - find empty commits in git history (eg. if a `git filter-branch` was run but `--prune-empty` was forgotten, leaking metadata like subjects containing file names or other sensitive info)
+  - `git_graph_commit_history.sh` - generates graphs of Git commits per year and per month for the entire history of the local Git repo checkout using GNUplot
+  - `git_graph_commit_times.sh` - graphs the GitHub commit times from all local adjacent Git repo checkouts listed in `setup/repos.txt` using Git log in each checkout and GNUplot
   - `git_files_in_history.sh` - finds all filename / file paths in the git log history, useful for prepping for `git filter-branch`
   - `git_filter_branch_fix_author.sh` - rewrites Git history to replace author/committer name & email references (useful to replace default account commits). Powerful, read `--help` and `man git-filter-branch` carefully. Should only be used by Git Experts
   - `git_filter_repo_replace_text.sh` - rewrites Git history to replace a given text to scrub a credential or other sensitive token from history. Refuses to operate on tokens less than 8 chars for safety
-  - `git_tag_release.sh` - creates a Git tag, auto-incrementing a `.N` suffix on the year/month/day date format if no exact version given
   - `git_submodules_update_repos.sh` - updates submodules (pulls and commits latest upstream github repo submodules) - used to cascade submodule updates throughout all my repos
   - `git_askpass.sh` - credential helper script to use environment variables for git authentication
   - `markdown_generate_index.sh` - generates a markdown index list from the headings in a given markdown file such as README.md
@@ -809,6 +812,7 @@ See also [Knowledge Base notes for Hadoop](https://github.com/HariSekhon/Knowled
   - `github_api.sh` - queries the GitHub [API](https://docs.github.com/en/rest/reference). Can infer GitHub user, repo and authentication token from local checkout or environment (`$GITHUB_USER`, `$GITHUB_TOKEN`)
   - `github_install_binary.sh` - installs a binary from GitHub releases into $HOME/bin or /usr/local/bin. Auto-determines the latest release if no version specified, detects and unpacks any tarball or zip files
   - `github_foreach_repo.sh` - executes a templated command for each non-fork GitHub repo, replacing the `{owner}`/`{name}` or `{repo}` placeholders in each iteration
+  - `github_graph_commit_times.sh` - graphs the GitHub commit times from all public GitHub repos for a given user. Fetches the commit data via the GitHub API and generates a bar chart using GNUplot
   - `github_clone_or_pull_all_repos.sh` - git clones or pulls all repos for a user or organization into directories of the same name under the current directory
   - `github_download_release_file.sh` - downloads a file from GitHub Releases, optionally determining the latest version, uses `bin/download_url_file.sh`
   - `github_download_release_jar.sh` - downloads a JAR file from GitHub Releases (used by `install/download_*_jar.sh` for things like [JDBC](https://github.com/HariSekhon/Knowledge-Base/blob/main/jdbc.md) drivers or [Java](#java) [decompilers](https://github.com/HariSekhon/Knowledge-Base/blob/main/java.md#java-decompilers)), optionally determines latest version to download, and finally validates the downloaded file's format
