@@ -26,6 +26,10 @@ Graphs the GitHub commit times from all public GitHub repos for a given user
 
 Fetches the commit data via the GitHub API and generates a bar chart using GNUplot
 
+A MermaidJS version of this program is adjacent in:
+
+    github_graph_commit_times_mermaidjs.sh
+
 A Golang version of this program can be found here:
 
     https://github.com/HariSekhon/GitHub-Graph-Commit-Times
@@ -54,7 +58,7 @@ trap_cmd "rm -f '$gnuplot_data'"
 if ! [ -f "$gnuplot_data" ]; then
     timestamp "Fetching list of GitHub repos"
     repos="$(get_github_repos "$username")"
-    timestamp "Found repos: $(wc -l <<< "$repos" | sed 's/[[:space:]]/g')"
+    timestamp "Found repos: $(wc -l <<< "$repos" | sed 's/[[:space:]]//g')"
     echo
 
     while read -r repo; do
