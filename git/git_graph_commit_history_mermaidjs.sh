@@ -89,23 +89,16 @@ awk '{print $2" "$1}' > "$data_year"
 timestamp "Wrote data: $data_year"
 echo
 
-parse_data(){
-    local data_file="$1"
-    local field="$2"
-    awk "{print \$$field}" "$data_file" |
-    tr '\n' ',' |
-    sed 's/,/, /g; s/, $//'
-}
-export -f parse_data
+export -f parse_file_col_to_csv
 
 timestamp "Generating MermaidJS code for Commits per Month"
 cat > "$code_month" <<EOF
 xychart-beta
-    title "Number of Commits"
-    x-axis [ $(parse_data "$data_month" 1) ]
-    y-axis "Commits"
-    bar    [ $(parse_data "$data_month" 2) ]
-    %%line [ $(parse_data "$data_month" 2) ]
+    title "Git Commits per Month"
+    x-axis [ $(parse_file_col_to_csv "$data_month" 1) ]
+    y-axis "Number of Commits"
+    bar    [ $(parse_file_col_to_csv "$data_month" 2) ]
+    %%line [ $(parse_file_col_to_csv "$data_month" 2) ]
 EOF
 timestamp "Generated MermaidJS code: $code_month"
 echo
@@ -113,11 +106,11 @@ echo
 timestamp "Generating MermaidJS code for Commits per Year"
 cat > "$code_year" <<EOF
 xychart-beta
-    title "Number of Commits"
-    x-axis [ $(parse_data "$data_year" 1) ]
-    y-axis "Commits"
-    bar    [ $(parse_data "$data_year" 2) ]
-    %%line [ $(parse_data "$data_year" 2) ]
+    title "Git Commits per Year"
+    x-axis [ $(parse_file_col_to_csv "$data_year" 1) ]
+    y-axis "Number of Commits"
+    bar    [ $(parse_file_col_to_csv "$data_year" 2) ]
+    %%line [ $(parse_file_col_to_csv "$data_year" 2) ]
 EOF
 timestamp "Generated MermaidJS code: $code_year"
 echo

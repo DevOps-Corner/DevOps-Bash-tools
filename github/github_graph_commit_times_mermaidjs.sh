@@ -20,9 +20,9 @@ srcdir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck disable=SC1090,SC1091
 . "$srcdir/lib/github.sh"
 
-image="github_commit_times.svg"
-data="github_commit_times.dat"
-code="github_commit_times.mmd"
+code="git_commit_times.mmd"
+data="data/git_commit_times.dat"
+image="images/git_commit_times.svg"
 
 # shellcheck disable=SC2034,SC2154
 usage_description="
@@ -33,6 +33,8 @@ Fetches the commit data via the GitHub API and generates a bar chart using Merma
 Generates the MermaidJS code and then uses MermaidJS CLI to generate the image
 
     $code - Code
+
+    $data - Data
 
     $image - Image
 
@@ -58,11 +60,15 @@ help_usage "$@"
 
 min_args 1 "$@"
 
-username="$1"
-
 check_bin mmdc
 
-trap_cmd "rm -f '$data'"
+username="$1"
+
+for x in $code \
+         $data \
+         $image; do
+    mkdir -p -v "$(dirname "$x")"
+done
 
 if ! [ -f "$data" ]; then
     timestamp "Fetching list of GitHub repos"
@@ -81,30 +87,27 @@ if ! [ -f "$data" ]; then
     echo
 fi
 
-timestamp "Generating MermaidJS code for bar chart of commit times"
+export -f parse_file_col_to_csv
+
+timestamp "Generating MermaidJS code for Commits per Hour"
 cat > "$code" <<EOF
 xychart-beta
     title "Git Commits by Hour"
-    x-axis [ $(awk '{print $1}' "$data" | tr '\n' ',' | sed 's/,/, /g; s/, $//') ]
-    y-axis "Commits"
-    bar    [ $(awk '{print $2}' "$data" | tr '\n' ',' | sed 's/,/, /g; s/, $//') ]
-    %%line [ $(awk '{print $2}' "$data" | tr '\n' ',' | sed 's/,/, /g; s/, $//') ]
+    x-axis [ $(parse_file_col_to_csv "$data" 1) ]
+    y-axis "Number of Commits"
+    bar    [ $(parse_file_col_to_csv "$data" 2) ]
+    %%line [ $(parse_file_col_to_csv "$data" 2) ]
 EOF
-timestamp "Generated MermaidJS code"
+timestamp "Generated MermaidJS code: $code"
 echo
 
-timestamp "Generating MermaidJS bar chart image: $image"
+timestamp "Generating MermaidJS bar chart for Commits per Hour"
 mmdc -i "$code" -o "$image" -t dark --quiet # -b transparent
 timestamp "Generated MermaidJS image: $image"
-
-if [ -n "${CACHE_GITHUB_COMMITS:-}" ]; then
-    rm "$data"
-fi
-untrap
 
 if is_CI; then
     exit 0
 fi
 
-timestamp "Opening generated bar chart"
+timestamp "Opening: $image"
 "$srcdir/../bin/imageopen.sh" "$image"
