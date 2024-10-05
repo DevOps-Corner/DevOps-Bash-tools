@@ -46,8 +46,8 @@ A Golang version of this program can be found here:
 
     https://github.com/HariSekhon/GitHub-Graph-Commit-Times
 
-Fetching GitHub commits via the API is slow so if \$CACHE_GITHUB_COMMITS is set will cache the data locally and not
-re-fetch it on subsequent runs (useful for tweaking the graph and just re-running quickly)
+Fetching GitHub commits via the API is slow so if there is a data cache updated in the last 7 days then uses that
+to save time re-fetching the same data. Delete it if you want to refresh
 
 Requires GitHub CLI and MermaidJS CLI to be installed and GH_TOKEN to be present
 "
@@ -70,7 +70,9 @@ for x in $code \
     mkdir -p -v "$(dirname "$x")"
 done
 
-if ! [ -f "$data" ]; then
+if file_modified_in_last_days "$data" 7; then
+    timestamp "Using cached data: $data"
+else
     timestamp "Fetching list of GitHub repos"
     repos="$(get_github_repos "$username")"
     timestamp "Found repos: $(wc -l <<< "$repos" | sed 's/[[:space:]]//g')"
@@ -84,8 +86,8 @@ if ! [ -f "$data" ]; then
     sort |
     uniq -c |
     awk '{print $2" "$1}' > "$data"
-    echo
 fi
+echo
 
 export -f parse_file_col_to_csv
 
