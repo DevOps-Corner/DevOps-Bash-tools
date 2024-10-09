@@ -205,8 +205,14 @@ make
 
 ## Index
 
-- [Linux & Mac](#linux--mac) - curl OAuth / JWT, LDAP, find duplicate files, SSL certificate get/validate, URL encoding/decoding, Vagrant, advanced configurations:
-  - `.bashrc`, `.bash.d/*.sh`, `.gitconfig`, `.vimrc`, `.screenrc`, `.tmux.conf`, `.toprc`, `.gitignore`...
+- [Dot Configs](#dot-configs) - `.gitconfig`, `.vimrc`, `.screenrc`, `.tmux.conf`, `.toprc`, `.gitignore`...
+- [Bash Environment & Libraries](#bash-environment--libraries) - `.bashrc`, `.bash.d/` interactive library, `lib/` scripting library
+- [Installation Scripts](#installation-scripts) for many popular open source technologies
+- [Linux & Mac](#linux--mac) - curl OAuth / JWT, LDAP, find duplicate files, SSL certificate get/validate, URL encoding/decoding, Vagrant
+- [Mac & AppleScript](#mac--applescript) - Mac settings and UI automation scripts, send keystrokes, mouse clicks,
+  detect foreground app, switch app, detect locked screen or screensaver, activate screensaver
+- [Monitoring](#monitoring) - Grafana, Prometheus, Node Exporter, scripted collection of common Linux & Mac cli
+  monitoring stats and log locations for quick generation of vendor support tarball bundles both locally and over SSH
 - [AWS - Amazon Web Services](#aws---amazon-web-services) - AWS account summary, lots of IAM reports, CIS Benchmark config hardening, EC2, ECR, EKS, Spot termination, S3 access logging, KMS key rotation info, SSM, CloudTrail, CloudWatch billing alarm with SNS notification topic and subscription for email alerts
 - [GCP - Google Cloud Platform](#gcp---google-cloud-platform) - massive GCP auto-inventory, scripts for GCE, GKE, GCR, Secret Manager, BigQuery, Cloud SQL, Cloud Scheduler, Terraform service account creation
 - [Kubernetes](#kubernetes) - massive Kubernetes auto-inventory, cluster management scripts & tricks
@@ -233,9 +239,9 @@ make
 - [Templates](https://github.com/HariSekhon/Templates) - Templates for AWS, GCP, Terraform, Docker, Jenkins, Cloud Build, Vagrant, Puppet, Python, Bash, Go, Perl, Java, Scala, Groovy, Maven, SBT, Gradle, Make, GitHub Actions, CircleCI, Jenkinsfile, Makefile, Dockerfile, docker-compose.yml etc.
 - [Kubernetes Configs](https://github.com/HariSekhon/Kubernetes-configs) - Kubernetes YAML configs for most common scenarios, including Production Best Practices, Tips & Tricks
 
-### Linux & Mac
+### Dot Configs
 
-Top-level `.bashrc`, `bin/`, `.bash.d/` and `configs/` directories:
+Top-level dotfiles and `configs/` directory:
 
 - `.*` - dot conf files for lots of common software eg. advanced `.vimrc`, `.gitconfig`, massive `.gitignore`, `.editorconfig`, `.screenrc`, `.tmux.conf` etc.
   - `.vimrc` - contains many awesome [vim](https://www.vim.org/) tweaks, plus hotkeys for linting lots of different file types in place, including Python, Perl, Bash / Shell, Dockerfiles, JSON, YAML, XML, CSV, INI / Properties files, LDAP LDIF etc without leaving the editor!
@@ -246,6 +252,11 @@ Top-level `.bashrc`, `bin/`, `.bash.d/` and `configs/` directories:
     - `.gitignore` - extensive Git ignore of trivial files you shouldn't commit
     - enhanced Git diffs
     - protections against committing AWS secret keys or merge conflict unresolved files
+
+### Bash Environment & Libraries
+
+Top-level `.bashrc` and `.bash.d/` directory:
+
 - `.bashrc` - shell tuning and sourcing of `.bash.d/*.sh`
 - `.bash.d/*.sh` - thousands of lines of advanced bashrc code, aliases, functions and environment variables for:
   - [Linux](https://en.wikipedia.org/wiki/Linux) & [Mac](https://en.wikipedia.org/wiki/MacOS)
@@ -265,36 +276,50 @@ Top-level `.bashrc`, `bin/`, `.bash.d/` and `configs/` directories:
   CI detection ([Travis CI](https://travis-ci.org/), [Jenkins](https://jenkins.io/) etc),
   port and HTTP url availability content checks etc.
   Sourced from all my other [GitHub repos](https://github.com/harisekhon) to make setting up Dockerized tests easier.
-- `install/install_*.sh` - various simple to use installation scripts for common technologies like
-  [AWS CLI](https://aws.amazon.com/cli/),
-  [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/?view=azure-cli-latest),
-  [GCloud SDK](https://cloud.google.com/sdk),
-  [Terraform](https://www.terraform.io/),
-  [Ansible](https://www.ansible.com/),
-  [MiniKube](https://kubernetes.io/docs/setup/learning-environment/minikube/),
-  [MiniShift](https://www.okd.io/minishift/)
-  (Kubernetes / [Redhat OpenShift](https://www.openshift.com/)/[OKD](https://www.okd.io/) dev VMs),
-  [Maven](https://maven.apache.org/),
-  [Gradle](https://gradle.org/),
-  [SBT](https://www.scala-sbt.org/),
-  [EPEL](https://fedoraproject.org/wiki/EPEL),
-  [RPMforge](http://repoforge.org/),
-  [Homebrew](https://brew.sh/),
-  [Travis CI](https://travis-ci.org/),
-  [Circle CI](https://circleci.com/),
-  [AppVeyor](https://www.appveyor.com/),
-  [BuildKite](https://buildkite.com),
-  [Parquet Tools](https://github.com/apache/parquet-mr/tree/master/parquet-tools)
-  etc.
+
+### Installation Scripts
+
+- `install/install_*.sh` - various simple to use installation scripts for common technologies like:
+  - [AWS CLI](https://aws.amazon.com/cli/)
+  - [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/?view=azure-cli-latest)
+  - [GCloud SDK](https://cloud.google.com/sdk)
+  - [GitHub CLI](https://cli.github.com/)
+  - [Terraform](https://www.terraform.io/)
+  - [Terragrunt](https://terragrunt.gruntwork.io/)
+  - [Direnv](https://direnv.net/)
+  - [Ansible](https://www.ansible.com/)
+  - [K3s](https://k3s.io)
+  - [MiniKube](https://kubernetes.io/docs/setup/learning-environment/minikube/) (Kubernetes)
+  - [MiniShift](https://www.okd.io/minishift/)
+    ([Redhat OpenShift](https://www.openshift.com/) / [OKD](https://www.okd.io/) dev VMs)
+  - [Maven](https://maven.apache.org/)
+  - [Gradle](https://gradle.org/)
+  - [SBT](https://www.scala-sbt.org/)
+  - [EPEL](https://fedoraproject.org/wiki/EPEL)
+  - [RPMforge](http://repoforge.org/)
+  - [Homebrew](https://brew.sh/)
+  - [Travis CI](https://travis-ci.org/)
+  - [Circle CI](https://circleci.com/)
+  - [AppVeyor](https://www.appveyor.com/)
+  - [BuildKite](https://buildkite.com)
+  - [Avro Tools](https://avro.apache.org/)
+  - [Parquet Tools](https://github.com/apache/parquet-mr/tree/master/parquet-tools)
+  - [Prometheus](https://prometheus.io/)
+  - various JDKs and RDBMS JDBC connector jars
+  - and many more...
+
+### Linux & Mac
+
+`bin/` directory:
+
 - `login.sh` - logs to major Cloud platforms if their credentials are found in the environment, CLIs such as AWS, GCP, Azure, GitHub... Docker registries: DockerHub, GHCR, ECR, GCR, GAR, ACR, Gitlab, Quay...
 - `clean_caches.sh` - cleans out OS package and programming language caches - useful to save space or reduce Docker image size
 - `delete_duplicate_files.sh` - deletes duplicate files with (N) suffixes, commonly caused by web browser downloads,
-- `download_url_file.sh` - downloads a file from a URL using wget with no clobber and continue support, or curl with atomic replacement to avoid race conditions. Used by `github/github_download_release_file.sh`, `github_download_release_jar.sh`, and `install/download_*_jar.sh`
-- `dump_stats.sh` - dumps common command outputs to text files in a local tarball. Useful to collect support information for vendor support cases
   in the given or current directory. Checks they're exact duplicates of a matching basename file without the (N) suffix with
   the exact same checksum for safety. Prompts to delete per file. To auto-accept deletions, do
   `yes | delete_duplicate_files.sh`. This is a fast way of cleaning up your `~/Downloads` directory and can be put your
   user crontab
+- `download_url_file.sh` - downloads a file from a URL using wget with no clobber and continue support, or curl with atomic replacement to avoid race conditions. Used by `github/github_download_release_file.sh`, `github_download_release_jar.sh`, and `install/download_*_jar.sh`
 - `curl_auth.sh` - shortens `curl` command by auto-loading your OAuth2 / JWT API token or username & password from environment variables or interactive starred password prompt through a ram file descriptor to avoid placing them on the command line (which would expose your credentials in the process list or OS audit log files). Used by many other adjacent API querying scripts
 - `find_duplicate_files*.sh` - finds duplicate files by size and/or checksum in given directory trees. Checksums are only done on files that already have matching byte counts for efficiency
 - `find_broken_links.sh` - find broken links with delays to avoid tripping defenses
@@ -306,10 +331,7 @@ Top-level `.bashrc`, `bin/`, `.bash.d/` and `configs/` directories:
 - `ldapsearch.sh` - shortens `ldapsearch` command by inferring switches from environment variables
 - `ldap_user_recurse.sh` / `ldap_group_recurse.sh` - recurse Active Directory LDAP users upwards to find all parent groups, or groups downwards to find all nested users (useful for debugging LDAP integration and group-based permissions)
 - `linux_distro_versions.sh` - quickly returns the list of major versions for a given Linux distro
-- `log_timestamp_large_intervals.sh` - finds log lines whose timestamp intervals exceed the given number of seconds and outputs those log lines with the difference between the last and current timestamps. Useful to find actions that are taking a long time from log files such as CI/CD logs
 - `diff_line_threshold.sh` - compares two files vs a line count diff threshold to determine if they are radically different. Used to avoid overwriting files which are not mere updates but completely different files
-- `mac_diff_settings.sh` - takes before and after snapshots of UI setting changes and diffs them to make it easy to find `defaults` keys to add to `setup/mac_settings.sh` to save settings
-- `mac_iso_to_usb.sh` - converts a given ISO file to a USB bootable image and burns it onto a given or detected inserted USB drive
 - `organize_downloads.sh` - moves files of well-known extensions in the `$HOME/Downloads` directory older than 1 week to capitalized subdirectories of their type to keep the `$HOME/Downloads/` directory tidy
 - `copy_to_clipboard.sh` - copies stdin or string arg to system clipboard on Linux or Mac
 - `paste_from_clipboard.sh` - pastes from system clipboard to stdout on Linux or Mac
@@ -320,8 +342,6 @@ Top-level `.bashrc`, `bin/`, `.bash.d/` and `configs/` directories:
 - `shred_file.sh` - overwrites a file 7 times to DoD standards before deleting it to prevent recovery of sensitive information
 - `shred_free_space.sh` - overwrites free space to prevent recovery of sensitive information for files that have already been deleted
 - `split.sh` - split large files into N parts (defaults to the number of your CPU cores) to parallelize operations on them
-- `ssh_dump_stats.sh` - uses SSH and `dump_stats.sh` to dump common command outputs from remote servers to a local tarball. Useful for vendor support cases
-- `ssh_dump_logs.sh` - Uses SSH to dump logs from server to local text files for uploading to vendor support cases
 - `ssl_get_cert.sh` - gets a remote `host:port` server's SSL cert in a format you can pipe, save and use locally, for example in Java truststores
 - `ssl_verify_cert.sh` - verifies a remote SSL certificate (battle tested more feature-rich version `check_ssl_cert.pl` exists in the [Advanced Nagios Plugins](https://github.com/HariSekhon/Nagios-Plugins) repo)
 - `ssl_verify_cert_by_ip.sh` - verifies SSL certificates on specific IP addresses, useful to test SSL source addresses for CDNs, such as Cloudflare Proxied sources before enabling SSL Full-Strict Mode for end-to-end, or Kubernetes ingresses (see also `curl_k8s_ingress.sh`)
@@ -331,7 +351,55 @@ Top-level `.bashrc`, `bin/`, `.bash.d/` and `configs/` directories:
 - `vagrant_total_mb.sh` - calculate the RAM committed to VMs in a `Vagrantfile`
 
 See also [Knowledge Base notes for Linux](https://github.com/HariSekhon/Knowledge-Base/blob/main/linux.md)
-and [Mac](https://github.com/HariSekhon/Knowledge-Base/blob/main/linux.md).
+and [Mac](https://github.com/HariSekhon/Knowledge-Base/blob/main/mac.md).
+
+### Mac & AppleScript
+
+Mac automation scripts to automate the Mac UI and settings
+
+`bin/` directory:
+
+- `mac_diff_settings.sh` - takes before and after snapshots of UI setting changes and diffs them to make it easy to find `defaults` keys to add to `setup/mac_settings.sh` to save settings
+- `mac_iso_to_usb.sh` - converts a given ISO file to a USB bootable image and burns it onto a given or detected inserted USB drive
+- `copy_to_clipboard.sh` - copies stdin or string arg to system clipboard on Linux or Mac
+- `paste_from_clipboard.sh` - pastes from system clipboard to stdout on Linux or Mac
+- `paste_diff_settings.sh` - Takes snapshots of before and after clipboard changes and diffs them to show config changes
+
+`applescript/` directory:
+
+- `keystrokes.sh` - send N keystroke combinations
+- `mouse_clicks.sh` - send N mouse click combinations to sequence of screen coordinates
+  - `get_mouse_coordinates.sh` - print the current mouse coordinates - to know what to pass to above script
+- `get_frontmost_process_title.scpt` - detect the frontmost window
+  - to detect if you should send keystrokes / mouse clicks)
+- `set_frontmost_process.scpt` - switch to bring the given app to the foreground to send keystrokes / mouse clicks to it
+  - `browser_get_default.scpt` - get the default configured browser in format passable to Applescript (for  above script)
+- `is_screen_locked.py` - detect if the screen is locked to stop sending keystrokes or mouse clicks
+- `is_screensaver_running.scpt` - detect if the screensaver is running to stop sending keystrokes or mouse clicks
+- `screensaver_activate.scpt` - activate screensaver
+
+See also [Mac](https://github.com/HariSekhon/Knowledge-Base/blob/main/mac.md) page
+in [HariSekhon/Knowledge-Base](https://github.com/HariSekhon/Knowledge-Base).
+
+### Monitoring
+
+`monitoring/` directory:
+
+- `dump_stats.sh` - dumps common command outputs to text files in a local tarball. Useful to collect support information
+  for vendor support cases
+- `grafana_api.sh` - queries the [Grafana](https://grafana.com/) API with authentication
+- `log_timestamp_large_intervals.sh` - finds log lines whose timestamp intervals exceed the given number of seconds and
+  outputs those log lines with the difference between the last and current timestamps. Useful to find actions that are
+  taking a long time from log files such as CI/CD logs
+- `prometheus.sh` - starts [Prometheus](https://prometheus.io/) locally, downloading it if not found in `$PATH`
+- `prometheus_docker.sh` - starts [Prometheus](https://prometheus.io/) in Docker using `docker-compose`
+- `prometheus_node_exporter.sh` - starts Prometheus `node_exporter` locally, downloading it if not found in `$PATH`
+- `ssh_dump_stats.sh` - uses SSH and `dump_stats.sh` to dump common command outputs from remote servers to a local
+  tarball. Useful for vendor support cases
+- `ssh_dump_logs.sh` - Uses SSH to dump logs from server to local text files for uploading to vendor support cases
+
+See doc pages in [HariSekhon/Knowledge-Base](https://github.com/HariSekhon/Knowledge-Base) on Grafana,
+Prometheus, OpenTSDB, InfluxDB etc.
 
 ### Databases
 
