@@ -43,6 +43,21 @@ to work around root file permissions issues and chown it to the login user
 
 
 Requires SSH client to be installed and configured to preferably passwordless ssh key access
+
+
+Tuning Authentication - SSH User and SSH Key
+
+If either of the following environment variables are set they will be added to the SSH commands:
+
+    SSH_USER
+    SSH_KEY
+
+To use a different SSH key - for example because you are iterating AWS EC2 servers, you can must either set SSH_KEY
+or else add that EC2 SSH key to your ssh-agent - see this doc:
+
+https://github.com/HariSekhon/Knowledge-Base/blob/main/ssh.md#use-ssh-agent
+
+Then run this script as usual
 "
 
 # used by usage() in lib/utils.sh
@@ -53,25 +68,31 @@ help_usage "$@"
 
 min_args 1 "$@"
 
-for server in "$@"; do
+for user_server in "$@"; do
     echo
+    server="${user_server##*@}"
+    user="${user_server%%@*}"
+    if [ "$user" = "$server" ]; then
+        user="${SSH_USER:-}"
+    fi
     tstamp="$(date '+%F_%H%M')"
     #for log in messages secure dmesg; do
     for log in messages dmesg; do
         log_file="log.$tstamp.$server.$log.txt"
         # ignore && && || it works
         # shellcheck disable=SC2015
-        timestamp "Dumping server $log log: $server" &&
+        timestamp "Dumping server '$server' log: $log" &&
+        # TODO: optimize by gzip compressing these logs on the server size
         if ! [[ "$server" =~ ^root@ ]]; then
             # want client side expansion
             # shellcheck disable=SC2029
-            ssh "$server" "sudo cp -v /var/log/$log ~/$log_file && sudo chown -v \$USER ~/$log_file" &&
-            scp "$server":"./$log_file" .
+            ssh ${SSH_KEY:+-i "$SSH_KEY"} ${user:+"$user@"}"$server" "sudo cp -v /var/log/$log ~/$log_file && sudo chown -v \$USER ~/$log_file" &&
+            scp ${SSH_KEY:+-i "$SSH_KEY"} ${user:+"$user@"}"$server":"./$log_file" .
         else
-            scp "$server":"/var/log/$log" "$log_file"
+            scp ${SSH_KEY:+-i "$SSH_KEY"} ${user:+"$user@"}"$server":"/var/log/$log" "$log_file"
         fi &&
-        timestamp "Dumped server $log log to file: $log_file" ||
-        warn "Failed to get $log log for server '$server'"
+        timestamp "Dumped server '$server' log to file: $log_file" ||
+        warn "Failed to get '$server' log: $log"
         # XXX: because race condition - spot instances can go away during execution
         # and we still want to collect the rest of the servers
     done

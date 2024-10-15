@@ -27,7 +27,17 @@ srcdir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 . "$srcdir/utils.sh"
 
 git_repo(){
-    git remote -v 2>/dev/null |
+    # give preference for origin, then GitHub, GitLab, Bitbucket, Azure DevOps in that order
+    local remotes
+    remotes="$( git remote -v 2>/dev/null)"
+    {
+        awk 'BEGIN {IGNORECASE=1} $1 ~ /origin/ {print}' <<< "$remotes"
+        awk 'BEGIN {IGNORECASE=1} $1 ~ /github/ {print}' <<< "$remotes"
+        awk 'BEGIN {IGNORECASE=1} $1 ~ /gitlab/ {print}' <<< "$remotes"
+        awk 'BEGIN {IGNORECASE=1} $1 ~ /bitbucket/ {print}' <<< "$remotes"
+        awk 'BEGIN {IGNORECASE=1} $1 ~ /azure/ {print}' <<< "$remotes"
+        echo "$remotes"
+    } |
     awk '{print $2}' |
     head -n1 |
     sed '
@@ -36,6 +46,7 @@ git_repo(){
         s/[^:/]*[:/]//;
         s/\.git$//;
         s|^/||;
+        s|/[^/]*/_git/|/|;
     '
 }
 

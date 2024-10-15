@@ -18,7 +18,9 @@ set -euo pipefail
 srcdir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # shellcheck disable=SC1090,SC1091
-. "$srcdir/lib/github.sh"
+. "$srcdir/lib/git.sh"
+
+repolist="$(readlink -f "$srcdir/../setup/repos.txt")"
 
 code="git_commit_times_all_repos.gnuplot"
 data="data/git_commit_times_all_repos.dat"
@@ -26,39 +28,42 @@ image="images/git_commit_times_all_repos.png"
 
 # shellcheck disable=SC2034,SC2154
 usage_description="
-Generates a GNUplot graph of Git commit times from all GitHub repos for a given user using the GitHub API
+Generates a GNUplot graph of Git commit times from all adjacent Git repos listed in:
+
+    $repolist
 
 Generates the following files:
 
     $code - Code
 
-    $data     - Data
+    $data  - Data
 
-    $image     - Image
+    $image - Image
 
-A MermaidJS version of this program is adjacent in:
+A MermaidJS version of this script is adjacent at:
 
-    github_graph_commit_times_mermaidjs.sh
+    git_graph_commit_times_mermaidjs_all_repos.sh
 
-A Golang version of this program can be found here:
+These adjacent scripts perform a similar function but using GitHub API commit data:
+
+    ../github/github_graph_commit_times_gnuplot.sh
+
+    ../github/github_graph_commit_times_mermaidjs.sh
+
+A Golang version of this program which uses the GitHub API can be found here:
 
     https://github.com/HariSekhon/GitHub-Graph-Commit-Times
 
-Fetching GitHub commits via the API is slow so if there is a data cache updated in the last 7 days then uses that
-to save time re-fetching the same data. Delete it if you want to refresh
-
-Requires GitHub CLI and GNUplot to be installed and GH_TOKEN to be present
+Requires Git and GNUplot to be installed to generate the graph
 "
 
 # used by usage() in lib/utils.sh
 # shellcheck disable=SC2034
-usage_args="<username>"
+usage_args=""
 
 help_usage "$@"
 
-min_args 1 "$@"
-
-username="$1"
+num_args 0 "$@"
 
 for x in $code \
          $data \
@@ -66,24 +71,41 @@ for x in $code \
     mkdir -p -v "$(dirname "$x")"
 done
 
-if file_modified_in_last_days "$data" 7; then
-    timestamp "Using cached data: $data"
+older_than(){
+    local file="$1"
+    local days="$2"
+    if ! [ -f "$file" ]; then
+        return 0
+    fi
+    if find "$file" -mtime +"$days" -print -quit | grep -q . ; then
+        return 0
+    fi
+    return 1
+}
+
+if ! older_than "$data" 7; then
+    timestamp "Using cached data since it is less than 7 days old: $data"
 else
-    timestamp "Fetching list of GitHub repos"
-    repos="$(get_github_repos "$username")"
-    timestamp "Found repos: $(wc -l <<< "$repos" | sed 's/[[:space:]]//g')"
+    timestamp "Getting list of Git repo checkout directories from: $repolist"
+    repo_dirs="$(sed 's/#.*//; s/.*://; /^[[:space:]]*$/d' "$repolist")"
+
+    timestamp "Found repos: $(wc -l <<< "$repo_dirs" | sed 's/[[:space:]]/g')"
     echo
 
-    while read -r repo; do
-        timestamp "Fetching commit times for repo: $repo"
-        gh api -H "Accept: application/vnd.github.v3+json" "/repos/$username/$repo/commits" --paginate |
-        jq -r '.[].commit.author.date[11:13]'
-    done <<< "$repos" |
+    while read -r repo_dir; do
+        repo_dir="$(readlink -f "$srcdir/../../$repo_dir")"
+        timestamp "Entering repo dir: $repo_dir"
+        pushd "$repo_dir" &>/dev/null || die "Failed to pushd to: $repo_dir"
+        timestamp "Fetching Hour of all commits from Git log"
+        git log --date=format:'%H' --pretty=format:'%ad'
+        popd &>/dev/null || die "Failed to popd from: $repo_dir"
+        echo
+    done <<< "$repo_dirs" |
     sort |
     uniq -c |
     awk '{print $2" "$1}' > "$data"
+    echo
 fi
-echo
 
 timestamp "Generating GNUplot code for Commits per Hour"
 sed '/^[[:space:]]*$/d' > "$code" <<EOF
@@ -94,7 +116,7 @@ sed '/^[[:space:]]*$/d' > "$code" <<EOF
 #
 set terminal pngcairo size 1280,720 enhanced font "Arial,14"
 set title "Git Commits by Hour"
-set xlabel "Hour of Day (UTC)"
+set xlabel "Hour of Day (author's local time)"
 set ylabel "Number of Commits"
 set grid
 #set xtics rotate by -45

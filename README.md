@@ -88,6 +88,7 @@ awkward URLs more nicely replaced with shields.io
 [![JSON](https://github.com/HariSekhon/DevOps-Bash-tools/actions/workflows/json.yaml/badge.svg)](https://github.com/HariSekhon/DevOps-Bash-tools/actions/workflows/json.yaml)
 [![YAML](https://github.com/HariSekhon/DevOps-Bash-tools/actions/workflows/yaml.yaml/badge.svg)](https://github.com/HariSekhon/DevOps-Bash-tools/actions/workflows/yaml.yaml)
 [![XML](https://github.com/HariSekhon/DevOps-Bash-tools/actions/workflows/xml.yaml/badge.svg)](https://github.com/HariSekhon/DevOps-Bash-tools/actions/workflows/xml.yaml)
+[![Markdown](https://github.com/HariSekhon/DevOps-Bash-tools/actions/workflows/markdown.yaml/badge.svg)](https://github.com/HariSekhon/DevOps-Bash-tools/actions/workflows/markdown.yaml)
 [![Validation](https://github.com/HariSekhon/DevOps-Bash-tools/actions/workflows/validate.yaml/badge.svg)](https://github.com/HariSekhon/DevOps-Bash-tools/actions/workflows/validate.yaml)
 [![Kics](https://github.com/HariSekhon/DevOps-Bash-tools/actions/workflows/kics.yaml/badge.svg)](https://github.com/HariSekhon/DevOps-Bash-tools/actions/workflows/kics.yaml)
 [![Grype](https://github.com/HariSekhon/DevOps-Bash-tools/actions/workflows/grype.yaml/badge.svg)](https://github.com/HariSekhon/DevOps-Bash-tools/actions/workflows/grype.yaml)
@@ -326,8 +327,6 @@ Top-level `.bashrc` and `.bash.d/` directory:
 - `find_broken_symlinks.sh` - find broken symlinks pointing to non-existent files/directories
 - `find_lock.sh` - tries to find if a lockfile is used in the given or current working directory by taking snapshots of the file list before and after a prompt in which you should open/close an application
 - `http_duplicate_urls.sh` - find duplicate URLs in a given web page
-- `image_join_stack.sh` - stack joins two images after matching their widths so they align correctly
-- `imageopen.sh` - opens the given image file using whatever available tool is found on Linux or Mac
 - `ldapsearch.sh` - shortens `ldapsearch` command by inferring switches from environment variables
 - `ldap_user_recurse.sh` / `ldap_group_recurse.sh` - recurse Active Directory LDAP users upwards to find all parent groups, or groups downwards to find all nested users (useful for debugging LDAP integration and group-based permissions)
 - `linux_distro_versions.sh` - quickly returns the list of major versions for a given Linux distro
@@ -493,6 +492,8 @@ Prometheus, OpenTSDB, InfluxDB etc.
     - `aws_iam_users_mfa_serials.sh` - lists AWS users [MFA](https://aws.amazon.com/iam/features/mfa/) serial numbers (differentiates Virtual vs Hardware MFAs)
     - `aws_iam_users_pw_last_used.sh` - lists AWS users and their password last used date
   - `aws_ip_ranges.sh` - get all AWS IP ranges for a given Region and/or Service using the IP range API
+  - `aws_eks_cloudwatch_logs.sh` - enables and fetches AWS EKS Master logs via CloudWatch
+  - `aws_eks_ssh_dump_logs.sh` - fetch system logs from EKS Worker Nodes EC2 VMs (eg. for support debug requests by vendors)
   - `aws_kms_key_rotation_enabled.sh` - lists [AWS KMS](https://aws.amazon.com/kms/) keys and whether they have key rotation enabled
   - `aws_kube_creds.sh` - auto-loads all [AWS EKS](https://aws.amazon.com/eks/) clusters credentials in the current --profile and --region so your kubectl is ready to rock on AWS
   - `aws_kubectl.sh` - runs kubectl commands safely fixed to a given [AWS EKS](https://aws.amazon.com/eks/) cluster using config isolation to avoid concurrency race conditions
@@ -701,6 +702,7 @@ See also [Knowledge Base notes for GCP](https://github.com/HariSekhon/Knowledge-
 - `kubernetes_delete_stuck_namespace.sh` - to forcibly delete those pesky kubernetes namespaces of 3rd party apps like Knative that get stuck and hang indefinitely on the finalizers during deletion
 - `kubeadm_join_cmd.sh` - outputs `kubeadm join` command (generates new token) to join an existing Kubernetes cluster (used in [vagrant kubernetes](https://github.com/HariSekhon/DevOps-Bash-tools/tree/master/vagrant/kubernetes) provisioning scripts)
 - `kubeadm_join_cmd2.sh` - outputs `kubeadm join` command manually (calculates cert hash + generates new token) to join an existing Kubernetes cluster
+- `kubernetes_nodes_ssh_dump_logs.sh` - fetch logs from Kubernetes nodes (eg. for support debug requests by vendors)
 - `kubectl_exec.sh` - finds and execs to the first Kubernetes pod matching the given name regex, optionally specifying the container name regex to exec to, and shows the full generated `kubectl exec` command line for clarity
 - `kubectl_exec2.sh` - finds and execs to the first Kubernetes pod matching given pod filters, optionally specifying the container to exec to, and shows the full generated `kubectl exec` command line for clarity
 - `kubectl_pods_per_node.sh` - lists number of pods per node sorted descending
@@ -859,6 +861,8 @@ See also [Knowledge Base notes for Hadoop](https://github.com/HariSekhon/Knowled
   - `git_foreach_branch.sh` - executes a command on all branches (useful in heavily version branched repos like in my [Dockerfiles](https://github.com/HariSekhon/Dockerfiles) repo)
   - `git_foreach_repo.sh` - executes a command against all adjacent repos from a given repolist (used heavily by many adjacent scripts)
   - `git_foreach_modified.sh` - executes a command against each file with git modified status
+  - `git_foreach_repo_replace_readme_actions.sh` - updates the `README.md` badges for GitHub Actions to match the local repo name. Useful to bulk fix copied badges quickly and easily
+  - `git_foreach_repo_update_readme.sh` - git-diff-commits the `README.md` for each Git repo checkout using adjacent `git_foreach_repo.sh` and `git_diff_commit.sh` scripts. Useful to quickly bulk update `README.md` in all your projects, such as when references need updating
   - `git_merge_all.sh` / `git_merge_master.sh` / `git_merge_master_pull.sh` - merges updates from master branch to all other branches to avoid drift on longer lived feature branches / version branches (eg. [Dockerfiles](https://github.com/HariSekhon/Dockerfiles) repo)
   - `git_remotes_add_origin_providers.sh` - auto-creates remotes for the 4 major public repositories ([GitHub](https://github.com/)/[GitLab](https://gitlab.com/)/[Bitbucket](https://bitbucket.org)/[Azure DevOps](https://dev.azure.com/)), useful for `git pull -all` to fetch and merge updates from all providers in one command
   - `git_remotes_set_multi_origin.sh` - sets up multi-remote origin for unified push to automatically keep the 4 major public repositories in sync (especially useful for [Bitbucket](https://bitbucket.org) and [Azure DevOps](https://dev.azure.com/) which don't have [GitLab](https://gitlab.com/)'s auto-mirroring from [GitHub](https://github.com/) feature)
@@ -871,8 +875,10 @@ See also [Knowledge Base notes for Hadoop](https://github.com/HariSekhon/Knowled
   - `git_log_empty_commits.sh` - find empty commits in git history (eg. if a `git filter-branch` was run but `--prune-empty` was forgotten, leaking metadata like subjects containing file names or other sensitive info)
   - `git_graph_commit_history_gnuplot.sh` - generates GNUplot graphs of Git commits per year and per month for the entire history of the local Git repo checkout
   - `git_graph_commit_history_mermaidjs.sh` - generates MermaidJS graphs of Git commits per year and per month for the entire history of the local Git repo checkout
-  - `git_graph_commit_times_gnuplot.sh` - generates GNUplot graph of the GitHub commit times from all local adjacent Git repo checkouts listed in `setup/repos.txt` using Git log in each checkout
-  - `git_graph_commit_times_mermaidjs.sh` - generates MermaidJS graph of the GitHub commit times from all local adjacent Git repo checkouts listed in `setup/repos.txt` using Git log in each checkout
+  - `git_graph_commit_times_gnuplot.sh` - generates a GNUplot graph of Git commit times from the current Git repo checkout's `git log`
+  - `git_graph_commit_times_mermaidjs.sh` - generates a MermaidJS graph of Git commit times from the current Git repo checkout's `git log`
+  - `git_graph_commit_times_gnuplot_all_repos.sh` - generates GNUplot graph of the GitHub commit times from all local adjacent Git repo checkouts listed in `setup/repos.txt` using Git log in each checkout
+  - `git_graph_commit_times_mermaidjs_all_repos.sh` - generates MermaidJS graph of the GitHub commit times from all local adjacent Git repo checkouts listed in `setup/repos.txt` using Git log in each checkout
   - `git_files_in_history.sh` - finds all filename / file paths in the git log history, useful for prepping for `git filter-branch`
   - `git_filter_branch_fix_author.sh` - rewrites Git history to replace author/committer name & email references (useful to replace default account commits). Powerful, read `--help` and `man git-filter-branch` carefully. Should only be used by Git Experts
   - `git_filter_repo_replace_text.sh` - rewrites Git history to replace a given text to scrub a credential or other sensitive token from history. Refuses to operate on tokens less than 8 chars for safety
@@ -1342,6 +1348,9 @@ See also [Knowledge Base notes for Perl](https://github.com/HariSekhon/Knowledge
 
 `media/` directory:
 
+- `image_join_vertical.sh` - joins two images top and bottom after matching their widths so they align correctly
+- `image_join_horizontal.sh` - joins two images left and right after matching their heights so they align correctly
+- `imageopen.sh` - opens the given image file using whatever available tool is found on Linux or Mac
 - `mp3_set_artist.sh` / `mp3_set_album.sh` - set the artist / album tag for all mp3 files under given directories. Useful for grouping artists/albums and audiobook author/books (eg. for correct importing into Mac's Books.app)
 - `mp3_set_track_name.sh` - set the track name metadata for mp3 files under given directories to follow their filenames. Useful for correctly displaying audiobook progress / chapters etc.
 - `mp3_set_track_order.sh` - set the track order metadata for mp3 files under given directories to follow the lexical file naming order. Useful for correctly ordering album songs and audiobook chapters (eg. for Mac's Books.app). Especially useful for enforcing global ordering on multi-CD audiobooks after grouping into a single audiobook using `mp3_set_album.sh` (otherwise default track numbers in each CD interleave in Mac's Books.app)
